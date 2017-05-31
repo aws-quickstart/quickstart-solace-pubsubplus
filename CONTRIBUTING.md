@@ -53,7 +53,7 @@ git commit -a -m "Your Commit Message"
 
 Note: the optional commit `-a` command line option will automatically "add" and "rm" edited files.
 
-#### Step 4a: Rebase (if you have not yet pushed our branch to origin) 
+#### Step 4a: Rebase (if you have not yet pushed your branch to origin, else goto step 4b.) 
 
 Assuming you have not yet pushed your branch to origin, use `git rebase` (not `git merge`) to synchronize your work with the main
 repository.
@@ -73,7 +73,7 @@ $ git rebase upstream/master
 
 #### Step 4b: Merge (if you have already pushed our branch to origin) 
 
-Assuming you have not yet pushed your branch to origin, use `git merge` (not `git rebase`) to synchronize your work with the main
+Assuming you have already pushed your branch to origin, use `git merge` (not `git rebase`) to synchronize your work with the main
 repository.
 
 First ensure there are not any changes to master that you need to pick up, then merge in your changes.  
