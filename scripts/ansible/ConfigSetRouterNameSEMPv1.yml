@@ -1,15 +1,17 @@
 ---
-#reload default-config monitoring-node
+#configure
+#router-name <name>
 - hosts: LOCALHOST
 
   tasks:
-    - name: Reboot VMR to Monitor node mode 
+    - name: Set router name
       uri:
          url:              "http://{{ ANSIBLE_VMR_IP }}:{{ ANSIBLE_VMR_SEMP_PORT }}/SEMP"
          method:           GET
          user:             "{{ ANSIBLE_USERNAME }}"
          password:         "{{ lookup('env','admin_password') }}"
-         body:             "<rpc semp-version='soltr/8_2VMR'><reload><default-config/><monitoring-node/></reload></rpc>"
+         body:             "<rpc semp-version='soltr/8_2VMR'>\
+                           <router-name><name>{{ LOCAL_INFO.ROLE }}</name></router-name></rpc>"
          force_basic_auth: yes
          status_code:      200
          body_format:      raw
