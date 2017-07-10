@@ -13,7 +13,7 @@
          url:              "http://{{ ANSIBLE_VMR_IP }}:{{ ANSIBLE_VMR_SEMP_PORT }}/SEMP"
          method:           GET
          user:             "{{ ANSIBLE_USERNAME }}"
-         password:         "{{ ANSIBLE_PASSWORD }}"
+         password:         "{{ lookup('env','admin_password') }}"
          body:             "<rpc semp-version='soltr/8_2VMR'>\
                            <hardware><message-spool><no><shutdown><{{ ROLE }}/></shutdown></no></message-spool></hardware></rpc>"
          force_basic_auth: yes
@@ -22,7 +22,7 @@
          return_content:   yes
       register: rpc_reply
       ignore_errors: True
-      until: rpc_reply|success
+      until: rpc_reply.content.find("code=\"ok\"") != -1
       retries: 60
       delay: 10
 
@@ -31,7 +31,7 @@
          url:              "http://{{ ANSIBLE_VMR_IP }}:{{ ANSIBLE_VMR_SEMP_PORT }}/SEMP"
          method:           GET
          user:             "{{ ANSIBLE_USERNAME }}"
-         password:         "{{ ANSIBLE_PASSWORD }}"
+         password:         "{{ lookup('env','admin_password') }}"
          body:             "<rpc semp-version='soltr/8_2VMR'>\
                            <service><mate-link><no><shutdown/></no></mate-link></service></rpc>"
          force_basic_auth: yes
@@ -40,6 +40,6 @@
          return_content:   yes
       register: rpc_reply
       ignore_errors: True
-      until: rpc_reply|success
+      until: rpc_reply.content.find("code=\"ok\"") != -1
       retries: 60
       delay: 10

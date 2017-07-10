@@ -1,4 +1,4 @@
-# How to contribute to a Solace Project
+# How to contribute to a Quickstart Project
 
 We'd love for you to contribute and welcome your help. Here are some guidelines to follow:
 
@@ -95,7 +95,7 @@ git push origin my-fix-branch
 
 #### Step 6: Pull Request
 
-In GitHub, send a pull request to `solace-samples-semp:master`. 
+In GitHub, send a pull request to `quickstart-solace-vmr:master`. 
 
 When fixing an existing issue, use the [commit message keywords](https://help.github.com/articles/closing-issues-via-commit-messages/) to close the associated GitHub issue.
 
