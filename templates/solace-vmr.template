@@ -719,7 +719,7 @@
                 "Handle": {
                     "Ref": "ClusterInfoHandle"
                 },
-                "Timeout": "120",
+                "Timeout": "300",
                 "Count": "1"
             }
         },
