@@ -54,13 +54,6 @@
             "Description": "Comma separated list of security groups for the members of the cluster (e.g. sg-7f16e910,sg-4be93ca2); The security groups must be in the same VPC as the subnets",
             "Type": "List<AWS::EC2::SecurityGroup::Id>"
         },
-        "NodeSpotPrice": {
-            "AllowedPattern": "([0-9]{1}[.]{1}[0-9]{2})",
-            "ConstraintDescription": "Must be decimal numeric value",
-            "Default": "0.00",
-            "Description": "Spot Price to bid for requested instances (0.00 will result in using on-demand instances)",
-            "Type": "String"
-        },
         "ParentStackName": {
             "Description": "Wrapper stack for this deployment",
             "Type": "String"
@@ -69,8 +62,15 @@
             "ConstraintDescription": "No more than 1024 GB per device (4 TB per node).",
             "Default": "0",
             "Description": "Allocated EBS storage for each block device (in GB; 4 devs per node); 0 indicates ephemeral storage only",
-            "MaxValue": "1024",
-            "MinValue": "0",
+            "AllowedValues": [
+                "0",
+                "20",
+                "40",
+                "80",
+                "160",
+                "320",
+                "640"
+            ],
             "Type": "Number"
         },
         "QSS3BucketName": {
@@ -113,7 +113,7 @@
                 "AMZNLINUXHVM": "ami-162c2575"
             },
             "ca-central-1": {
-                "AMZNLINUXHVM": "ami-b968bad6"
+                "AMZNLINUXHVM": "ami-a7aa15c3"
             },
             "eu-west-1": {
                 "AMZNLINUXHVM": "ami-01ccc867"
@@ -149,7 +149,39 @@
             "Amazon-Linux-HVM": {
                 "BootDisk": "/dev/xvda"
             }
+        },
+        "Linux2SpoolDisk": {
+            "Amazon-Linux-HVM": {
+                "SpoolDisk": "/dev/xvdb"
+            }
+        },
+        "IOPsMap": {
+            "0": {
+                "IOPs" : "0"
+            },
+            "20": {
+                "IOPs" : "1000"
+            },
+            "40": {
+                "IOPs" : "2000"
+            },
+            "80": {
+                "IOPs": "4000"
+            },
+            "160": {
+                "IOPs": "8000"
+            },
+            "320": {
+                "IOPs": "16000"
+            },
+            "640": {
+                "IOPs": "20000"
+            }
         }
+
+
+
+
     },
     "Conditions": {
         "EphemeralStorage": {
@@ -158,14 +190,6 @@
                     "Ref": "PersistentStorage"
                 },
                 "0"
-            ]
-        },
-        "OnDemandInstances": {
-            "Fn::Equals": [
-                {
-                    "Ref": "NodeSpotPrice"
-                },
-                "0.00"
             ]
         },
         "GovCloudCondition": {
@@ -205,7 +229,7 @@
             "Metadata": {
                 "AWS::CloudFormation::Init": {
                     "configSets" : {
-                        "install_all" : [ "install_awscli", "install_logs", "install_docker", "install_ansible", "install_solace" ]
+                        "install_all" : [ "install_awscli", "install_logs", "install_docker", "install_extras", "install_solace" ]
                     },
 
                 "install_awscli": {
@@ -296,25 +320,34 @@
                             "lvm2" : []
                         }
                     },
+                    "files": {
+                        "/etc/sysconfig/docker": {
+                            "content": { "Fn::Join": [ "", [
+                                "DAEMON_PIDFILE_TIMEOUT=10\n",
+                                "OPTIONS=\"--default-ulimit nofile=1024:4096 --iptables=false --storage-driver overlay2\"\n"
+                            ] ] },
+                            "mode": "000444",
+                            "owner": "root",
+                            "group": "root"
+                        }
+                    },
                     "services" : {
                         "sysvinit" : {
                             "docker" : {
                                 "enabled" : "true",
-                                "ensureRunning" : "true"
+                                "ensureRunning" : "true",
+                                "files" :[ "/etc/sysconfig/docker" ]
                             }
                         }
                     }
                 },
 
-                "install_ansible": {
+                "install_extras": {
                     "packages" : {
-                    "yum" : {
-                        "epel-release" : [],
-                        "jq" : []
-                    },
-                    "python" : {
-                        "ansible" : []
-                    }
+                        "yum" : {
+                            "epel-release" : [],
+                            "jq" : []
+                        }
                     }
                 },
                 "install_solace" : {
@@ -416,25 +449,6 @@
                                 "mode": "000755",
                                 "owner": "root",
                                 "group": "root"
-                            },
-                            "/tmp/ansible.tgz": {
-                                "source": {
-                                    "Fn::Sub": [
-                                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}/scripts/ansible/ansible.tgz",
-                                        {
-                                            "QSS3Region": {
-                                                "Fn::If": [
-                                                    "GovCloudCondition",
-                                                    "s3-us-gov-west-1",
-                                                    "s3"
-                                                ]
-                                            }
-                                         }
-                                    ] 
-                                },
-                                "mode": "000755",
-                                "owner": "root",
-                                "group": "root"
                             }
                         }
                     }
@@ -476,6 +490,29 @@
                                     },
                                     "DeleteOnTermination": "False"
                                 }
+                            },
+                            {
+                                 "DeviceName": {
+                                    "Fn::FindInMap": [
+                                        "Linux2SpoolDisk",
+                                        "Amazon-Linux-HVM",
+                                        "SpoolDisk"
+                                    ]
+                                },
+                                "Ebs": {
+                                    "VolumeSize": {
+                                        "Ref": "PersistentStorage"
+                                    },
+                                    "DeleteOnTermination": "False",
+                                    "VolumeType": "io1",
+                                    "Iops":{
+                                        "Fn::FindInMap": [
+                                            "IOPsMap",
+                                            { "Ref": "PersistentStorage" },
+                                            "IOPs"
+                                        ]
+                                    }
+                                }                               
                             }
                         ]
                     ]
@@ -489,17 +526,6 @@
                 },
                 "InstanceType": {
                     "Ref": "NodeInstanceType"
-                },
-                "SpotPrice": {
-                    "Fn::If": [
-                        "OnDemandInstances",
-                        {
-                            "Ref": "AWS::NoValue"
-                        },
-                        {
-                            "Ref": "NodeSpotPrice"
-                        }
-                    ]
                 },
                 "KeyName": {
                     "Ref": "KeyPairName"
@@ -526,8 +552,6 @@
                                 "AMI_SBIN=/tmp\n",
                                 "yum install -y aws-cfn-bootstrap\n",
                                 "\n",
-                                "yum install -y docker\n",
-                                "service docker start\n",
                                 "## Retrieve scripts to deploy Solace on the instances \n",
                                 "/opt/aws/bin/cfn-init -v ",
                                 "    --stack ", { "Ref": "AWS::StackName" },
@@ -561,18 +585,21 @@
                                 "    --region ",{ "Ref": "AWS::Region" },
                                 "    --resources $instance_id --tags Key=Name,Value=$instance_tag\n",
                                 "\n",
+                                "cd /tmp\n",
+                                "# Install Solace\n",
+                                "$AMI_SBIN/install-solace.sh -c /tmp/solacehosts -d /tmp/solace",
+                                "  -u ",
+                                    { "Ref": "SolaceDockerURL" },
+                                "  -p /tmp/solOSpasswd",
+                                "  -s ",
+                                   { "Ref": "PersistentStorage" },
+                                "  -v /dev/xvdb",
+                                " \n",
                                 "## Signal back information for outputs (now that all nodes are up) \n",
                                 "/opt/aws/bin/cfn-signal -e 0 -r 'Solace HA deployment complete' '",
                                    { "Ref": "ClusterInfoHandle" },
                                    "'\n",
-                                "\n",
-                                "cd /tmp\n",
-                                "tar zxf ansible.tgz\n",
-                                "$AMI_SBIN/install-solace.sh -c /tmp/solacehosts -d /tmp/ansible ",
-                                "  -u ",
-                                    { "Ref": "SolaceDockerURL" },
-                                "  -p /tmp/solOSpasswd",
-                                " \n"
+                                "\n"
                             ]
                         ]
                     }
