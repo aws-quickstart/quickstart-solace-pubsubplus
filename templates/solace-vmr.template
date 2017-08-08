@@ -237,7 +237,6 @@
         "PrivateSubnetIDs": {
             "Description": "Comma separated list of VPC private subnet IDs for the cluster deployment (e.g. subnet-4b8d329f,subnet-bd73afc8); VPC must exist with proper configuration for Solace cluster access",
             "Type": "List<AWS::EC2::Subnet::Id>",
-            "Default": "subnet-4b8d329f,subnet-bd73afc8"
         },
          "PublicSubnetIDs": {
             "Description": "Comma separated list of VPC public subnet IDs for the cluster deployment (e.g. subnet-4b8d329f,subnet-bd73afc8); VPC must exist with proper configuration for Solace cluster access",
