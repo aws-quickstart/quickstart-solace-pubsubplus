@@ -347,6 +347,7 @@
                             "Statement": [
                                 {
                                     "Action": [
+                                        "cloudformation:DescribeStackResources",
                                         "ec2:DescribeInstances",
                                         "ec2:CreateTags"
                                     ],
