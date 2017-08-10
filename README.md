@@ -57,16 +57,6 @@ The next screen will allow you to fill in the details of the root AWS stack for 
 | **Network Parameters**     |  |
 | AvailabilityZones          | Pick 3 AZs from the drop down menue, alternativey pick 2 for PoC or limited Region |
 | NumberOfAZs                | Default is 3 unless only 2 AZs are selected above |
-| VPCCIDR                    | Unless specific requirement for internal addressing leave at default, must encapsulate all the above Subnets |
-| PublicSubnet1CIDR          | Unless specific requirement for internal addressing leave at default |
-| PublicSubnet2CIDR          | Unless specific requirement for internal addressing leave at default |
-| PublicSubnet3CIDR          | Unless specific requirement for internal addressing leave at default |
-| PrivateSubnet1ACIDR        | Unless specific requirement for internal addressing leave at default |
-| PrivateSubnet2ACIDR        | Unless specific requirement for internal addressing leave at default |
-| PrivateSubnet3ACIDR        | Unless specific requirement for internal addressing leave at default |
-| PrivateSubnet1BCIDR        | Unless specific requirement for internal addressing leave at default |
-| PrivateSubnet2BCIDR        | Unless specific requirement for internal addressing leave at default |
-| PrivateSubnet3BCIDR        | Unless specific requirement for internal addressing leave at default |
 | RemoteAccessCIDR           | IP range that can send/recieve messages, use 0.0.0.0/0 if unsure |
 | SSHAccessCIDR              | IP range that can configure VMR, use 0.0.0.0/0 if unsure |
 | **EC2 Parameters**         |  |
@@ -74,11 +64,8 @@ The next screen will allow you to fill in the details of the root AWS stack for 
 | LinuxOSAMI                 | Default is Amazon-Linux-HVM, recommended stay with this selection |
 | BootDiskSize               | Default is 24GB minimum is 20GB |
 | MessageRouterNodeInstance  | Default is t2.large which is the minimum |
-| MessageRouterNodeSpotPrice | Default is 0.00 which means not to use spot price |
 | MessageRouterNodeStorage   | Default is 0 which means ephemeral |
 | MonitorNodeInstance        | Default is t2.large which is the minimum | 
-| MonitorNodeeSpotPrice      | Default is 0.00 which means not to use spot price |
-| MonitorNodeStorage         | Default is 0 which means ephemeral |
 | **AWS QuickStart Config**  |  |
 | QSS3BucketName             | Leave at default |
 | QSS3KeyPrefix              | Leave at default |

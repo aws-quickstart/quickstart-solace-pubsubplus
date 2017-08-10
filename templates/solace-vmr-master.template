@@ -414,12 +414,6 @@
                             "Outputs.BastionSecurityGroupID"
                         ]
                     },                                        
-                    "VPCCIDR": {
-                        "Fn::GetAtt": [
-                            "VPCStack",
-                            "Outputs.VPCCIDR"
-                        ]
-                    },
                     "PrivateSubnetIDs" : {
                         "Fn::If": [
                             "UsePrivateSubnets",
