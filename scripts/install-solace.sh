@@ -59,10 +59,9 @@ mkdir $solace_directory
 cd $solace_directory
 echo "`date` INFO: Configure VMRs Started"
 
-
 echo "`date` INFO: check to make sure we have a complete load"
 wget -O ${solace_directory}/solos.info -nv  https://products.solace.com/download/VMR_DOCKER_EVAL_MD5
-
+IFS=' ' read -ra SOLOS_INFO <<< `cat ${solace_directory}/solos.info`
 MD5_SUM=${SOLOS_INFO[0]}
 SolOS_LOAD=${SOLOS_INFO[1]}
 echo "`date` INFO: Reference md5sum is: ${MD5_SUM}"
@@ -70,23 +69,25 @@ echo "`date` INFO: Reference md5sum is: ${MD5_SUM}"
 wget -q -O solace-redirect ${solace_url}
 REAL_LINK=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=]*" ${solace_directory}/solace-redirect`
 wget -q -O  ${solace_directory}/${SolOS_LOAD} ${REAL_LINK}
-LOCAL_MD5_SUM=`md5sum ${solace_directory}/${SolOS_LOAD}`
-if [ ${LOCAL_MD5_SUM[0]} -ne ${MD5_SUM} ]; then
+cd ${solace_directory}
+LOCAL_OS_INFO=`md5sum ${SolOS_LOAD}`
+IFS=' ' read -ra SOLOS_INFO <<< ${LOCAL_OS_INFO}
+LOCAL_MD5_SUM=${SOLOS_INFO[0]}
+if [ ${LOCAL_MD5_SUM} != ${MD5_SUM} ]; then
     echo "`date` WARN: Possible corrupt SolOS load, md5sum do not match"
 else
     echo "`date` INFO: Successfully downloaded ${SolOS_LOAD}"
 fi
 
 
-
 # Make sure Docker is actually up
 docker_running=""
 loop_guard=6
 loop_count=0
-while [[ ${loop_count} -ne ${loop_guard} ]]; do 
+while [ ${loop_count} != ${loop_guard} ]; do 
     sleep 10
     docker_running=`service docker status | grep -o running`
-    if [ ${docker_running} -ne "running" ]; then
+    if [ ${docker_running} != "running" ]; then
         ((loop_count++))
         echo "`date` WARN: Tried to launch Solace but Docker in state ${docker_running}"
     else
