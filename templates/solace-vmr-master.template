@@ -108,6 +108,7 @@
         },
         "AdminPassword": {
             "Description": "Require password to access SolOS admin console and SEMP",
+            "NoEcho": "true",
             "Type": "String"
         },
         "AvailabilityZones": {
