@@ -32,16 +32,8 @@
         "ParameterValue": "t2.large"
     },
     {
-        "ParameterKey": "MonitorNodeStorage",
-        "ParameterValue": "0"
-    },
-    {
         "ParameterKey": "KeyPairName",
         "ParameterValue": "$[alfred_getkeypair]"
-    },
-    {
-        "ParameterKey": "CreatePrivateSubnets",
-        "ParameterValue": "true"
     },
     {
         "ParameterKey": "QSS3BucketName",

@@ -20,7 +20,6 @@
                     "Parameters": [
                         "AvailabilityZones",
                         "NumberOfAZs",
-                        "CreatePrivateSubnets",
                         "SSHAccessCIDR",
                         "RemoteAccessCIDR"
                     ]
@@ -88,9 +87,6 @@
                 },
                 "KeyPairName": {
                     "default": "Key Pair Name"
-                },
-                "CreatePrivateSubnets": {
-                    "default": "Create production ready enviroment"
                 },
                 "QSS3BucketName": {
                     "default": "Quick Start S3 Bucket Name"
@@ -168,15 +164,6 @@
             "Description": "Name of an existing EC2 key pair within the AWS region; all instances will launch with this key pair",
             "Type": "AWS::EC2::KeyPair::KeyName"
         },
-        "CreatePrivateSubnets": {
-            "AllowedValues": [
-                "true",
-                "false"
-            ],
-            "Default": "true",
-            "Description": "Whether to create and use Private Subnets with fronting ELBs",
-            "Type": "String"
-        },
         "RemoteAccessCIDR": {
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$",
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/x",
@@ -230,14 +217,6 @@
                 "3"
             ]
         },
-        "UsePrivateSubnets": {
-            "Fn::Equals": [
-                {
-                    "Ref": "CreatePrivateSubnets"
-                },
-                "true"
-            ]
-        },
         "GovCloudCondition": {
             "Fn::Equals": [
                 {
@@ -274,9 +253,7 @@
                             }
                         ]
                     },
-                    "CreatePrivateSubnets": {
-                        "Ref": "CreatePrivateSubnets"
-                    },
+                    "CreatePrivateSubnets": "false",
                     "KeyPairName": {
                         "Ref": "KeyPairName"
                     },
@@ -289,7 +266,6 @@
 
         "BastionStack": {
             "Type": "AWS::CloudFormation::Stack",
-            "Condition": "UsePrivateSubnets",
             "DependsOn": [
                 "VPCStack"
             ],
@@ -406,71 +382,13 @@
                     "RemoteAccessCIDR": {
                         "Ref": "RemoteAccessCIDR"
                     },
-                    "UsePrivateSubnets": {
-                        "Ref": "CreatePrivateSubnets"  
-                    },
                     "SSHSecurityGroupID": {
                         "Fn::GetAtt": [
                             "BastionStack",
                             "Outputs.BastionSecurityGroupID"
                         ]
                     },                                        
-                    "PrivateSubnetIDs" : {
-                        "Fn::If": [
-                            "UsePrivateSubnets",
-                            {
-                                "Fn::If": [
-                                    "Use3AZs",
-                                    {
-                                        "Fn::Join": [
-                                            ",",
-                                            [
-                                                {
-                                                    "Fn::GetAtt": [
-                                                        "VPCStack",
-                                                        "Outputs.PrivateSubnet1AID"
-                                                    ]
-                                                },
-                                                {
-                                                    "Fn::GetAtt": [
-                                                        "VPCStack",
-                                                        "Outputs.PrivateSubnet2AID"
-                                                    ]
-                                                },
-                                                {
-                                                    "Fn::GetAtt": [
-                                                        "VPCStack",
-                                                        "Outputs.PrivateSubnet3AID"
-                                                    ]
-                                                }
-                                            ]
-                                        ]
-                                    },
-                                    {
-                                        "Fn::Join": [
-                                            ",",
-                                            [
-                                                {
-                                                    "Fn::GetAtt": [
-                                                        "VPCStack",
-                                                        "Outputs.PrivateSubnet1AID"
-                                                    ]
-                                                },
-                                                {
-                                                    "Fn::GetAtt": [
-                                                        "VPCStack",
-                                                        "Outputs.PrivateSubnet2AID"
-                                                    ]
-                                                }
-                                            ]
-                                        ]
-                                    }
-                                ]
-                            },
-                            {}
-                        ]
-                    },
-                    "PublicSubnetIDs" : {
+                    "SubnetIDs" : {
                         "Fn::If": [
                             "Use3AZs",
                             {
