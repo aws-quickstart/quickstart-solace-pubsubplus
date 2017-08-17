@@ -1,14 +1,14 @@
 # Install and configure Solace message routers in an HA tuple using AWS Cloud Formation
 
-![alt text](https://raw.githubusercontent.com/aws-quickstart/quickstart-linux-bastion/develop/images/Solace-AWS-HA-Prod-3AZ.png "Production enviroment for Solace VMR")
+![alt text](https://raw.githubusercontent.com/aws-quickstart/quickstart-solace-vmr/develop/images/Solace-AWS-HA-Prod-3AZ.png "Production enviroment for Solace VMR")
 
-This QuickStart template installs Solace Virtual Message Routers (VMRs) in high-availability (HA) redundancy groups for fault tolerance. HA redundancy provides 1:1 router sparing to increase overall service availability. If one of the routers fails or is taken out of service, the other router automatically takes over and provides service to the clients that were previously served by the now-out-of-service router.  To increase availability the meassage routers are deployed across 3 availability zones.
+This QuickStart template installs Solace Virtual Message Routers (VMRs) in high-availability (HA) redundancy groups for fault tolerance. HA redundancy provides 1:1 router sparing to increase overall service availability. If one of the routers fails or is taken out of service, the other router automatically takes over and provides service to the clients that were previously served by the now-out-of-service router.  To increase availability the message routers are deployed across 3 availability zones.
 
 To learn more about VMR redundancy see the [Redundancy Documentation](http://docs.solace.com/Features/VMR-Redundancy.htm).  If you are not familiar with Solace or the high-available configurations it is recommended that you review this document. 
 
 ![alt text](https://raw.githubusercontent.com/aws-quickstart/quickstart-linux-bastion/develop/images/Solace-AWS-HA-PoC-2AZ.png "Proof of Concept enviroment for Solace VMR")
 
-Alternatively this quickstart can create Solace VMRs in an enviroment suitable for Proof Of Concept testing where loss of an AWS Availability Zone will not cause loss of access to mission critical data.
+Alternatively this quickstart can create Solace VMRs in an environment suitable for Proof Of Concept testing where loss of an AWS Availability Zone will not cause loss of access to mission critical data.
 
 To learn more about connectivity to the HA redundancy group see the AWS [VPC Gateway Documentation](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html).
 
@@ -21,7 +21,7 @@ This is a two step process:
     <img src="https://raw.githubusercontent.com/aws-quickstart/quickstart-linux-bastion/develop/images/register.png"/>
 </a>
 
-* Go to AWS Cloud Formation service and launch template.  The following links are for your convenience and take you directly to the templates for Solace Mesage Routers.
+* Go to AWS Cloud Formation service and launch template.  The following links are for your convenience and take you directly to the templates for Solace Message Routers.
 
 <a href="https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=Solace-HA&templateURL=https://s3.amazonaws.com/solace-aws-ha-quickstart/latest/templates/solace-vmr-master.template" target="_blank">
     <img src="https://raw.githubusercontent.com/aws-quickstart/quickstart-linux-bastion/develop/images/launch-button-new.png"/>
@@ -55,12 +55,12 @@ The next screen will allow you to fill in the details of the root AWS stack for 
 | SolaceDockerURL            | URL cut and paste from the registration email |
 | AdminPassword              | Password to allow SolOS access to configure the Solace Message Router instances |
 | **Network Parameters**     |  |
-| AvailabilityZones          | Pick 3 AZs from the drop down menue, alternativey pick 2 for PoC or limited Region |
+| AvailabilityZones          | Pick 3 AZs from the drop down menu, alternatively pick 2 for PoC or limited Region |
 | NumberOfAZs                | Default is 3 unless only 2 AZs are selected above |
-| RemoteAccessCIDR           | IP range that can send/recieve messages, use 0.0.0.0/0 if unsure |
+| RemoteAccessCIDR           | IP range that can send/receive messages, use 0.0.0.0/0 if unsure |
 | SSHAccessCIDR              | IP range that can configure VMR, use 0.0.0.0/0 if unsure |
 | **EC2 Parameters**         |  |
-| KeyPairName                | Pick from your exisitng key pairs, create new AWSW key pair if required |
+| KeyPairName                | Pick from your existing key pairs, create new AWSW key pair if required |
 | LinuxOSAMI                 | Default is Amazon-Linux-HVM, recommended stay with this selection |
 | BootDiskSize               | Default is 24GB minimum is 20GB |
 | MessageRouterNodeInstance  | Default is t2.large which is the minimum |
@@ -74,7 +74,7 @@ The next screen will allow you to fill in the details of the root AWS stack for 
 
 Select [next] on the "Options" screen unless you want to add tags, use specific IAM roles, or blend in custom stacks.
 
-Acknoledge that resources will be created and select [Create] in bottom right corner.
+Acknowledge that resources will be created and select [Create] in bottom right corner.
 
 ![alt text](https://raw.githubusercontent.com/aws-quickstart/quickstart-linux-bastion/develop/images/capabilities.png "Create Stack")
 
@@ -84,7 +84,7 @@ Quick Starts are automated reference deployments for key workloads on the AWS Cl
 
 # Testing data access to the ha cluster
 
-To test data traffic though the newly created VMR instances, visit the Solace developer portal and and select your prefered programming langauge to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/). Under each language there is a Publish/Subscribe tutorial that will help you get started.
+To test data traffic though the newly created VMR instances, visit the Solace developer portal and select your preferred programming language to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/). Under each language there is a Publish/Subscribe tutorial that will help you get started.
 
 ![alt text](https://raw.githubusercontent.com/aws-quickstart/quickstart-linux-bastion/develop/images/solace_tutorial.png "getting started publish/subscribe")
 

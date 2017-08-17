@@ -15,10 +15,8 @@
                     "Label": { "default": "Network Configuration" },
                     "Parameters": [
                         "VPCID",
-                        "NumberOfAZs",
-                        "UsePrivateSubnets",                    
-                        "PublicSubnetIDs",
-                        "PrivateSubnetIDs",                       
+                        "NumberOfAZs",                
+                        "SubnetIDs",                     
                         "RemoteAccessCIDR",
                         "SSHSecurityGroupID"
                     ]
@@ -80,16 +78,10 @@
                 "SSHSecurityGroupID": {
                     "default": "Security group allowed to access console ssh"
                 },
-                "UsePrivateSubnets": {
-                    "default": "Use private subnets"
-                },
                 "VPCID": {
                     "default": "VPC ID"
                 },
-                "PrivateSubnetIDs": {
-                    "default": "Private Subnet IDs"
-                },
-                "PublicSubnetIDs": {
+                "SubnetIDs": {
                     "default": "Public Subnet IDs"
                 },
                 "QSS3BucketName": {
@@ -189,20 +181,7 @@
             "Description": "ID of the SSH Security Group (e.g., sg-7f16e910)",
             "Type": "AWS::EC2::SecurityGroup::Id"
         },
-        "UsePrivateSubnets": {
-            "AllowedValues": [
-                "true",
-                "false"
-            ],
-            "Default": "true",
-            "Description": "Whether to use Private Subnets with fronting Bastion Servers",
-            "Type": "String"
-        },
-        "PrivateSubnetIDs": {
-            "Description": "Comma separated list of VPC private subnet IDs for the cluster deployment (e.g. subnet-4b8d329f,subnet-bd73afc8); VPC must exist with proper configuration for Solace cluster access",
-            "Type": "List<AWS::EC2::Subnet::Id>"
-        },
-         "PublicSubnetIDs": {
+        "SubnetIDs": {
             "Description": "Comma separated list of VPC public subnet IDs for the cluster deployment (e.g. subnet-4b8d329f,subnet-bd73afc8); VPC must exist with proper configuration for Solace cluster access",
             "Type": "List<AWS::EC2::Subnet::Id>"
         },
@@ -296,12 +275,6 @@
             "Fn::Equals": [
                 {"Ref": "NumberOfAZs"},
                 "3"
-            ]
-        },
-        "UsePrivateSubnetsCondition": {
-            "Fn::Equals": [
-                { "Ref": "UsePrivateSubnets" },
-                "true"
             ]
         },
         "GovCloudCondition": {
@@ -448,13 +421,7 @@
                     "SubnetID": {
                         "Fn::Select": [
                             0,
-                            { 
-                                "Fn::If": [
-                                    "UsePrivateSubnetsCondition",
-                                    { "Ref": "PrivateSubnetIDs" }, 
-                                    { "Ref": "PublicSubnetIDs" }
-                                    ] 
-                            }
+                            { "Ref": "SubnetIDs" }
                         ]
                     }
                 }
@@ -526,13 +493,7 @@
                     "SubnetID": {
                         "Fn::Select": [
                             1,
-                            { 
-                                "Fn::If": [
-                                    "UsePrivateSubnetsCondition",
-                                    { "Ref": "PrivateSubnetIDs" }, 
-                                    { "Ref": "PublicSubnetIDs" }
-                                    ] 
-                            }
+                            { "Ref": "SubnetIDs" }
                         ]
                     }
                 }
@@ -601,13 +562,7 @@
                     "SubnetID": {
                         "Fn::Select": [
                             { "Fn::If": ["Use3AZs", 2, 1] },
-                            { 
-                                "Fn::If": [
-                                    "UsePrivateSubnetsCondition",
-                                    { "Ref": "PrivateSubnetIDs" }, 
-                                    { "Ref": "PublicSubnetIDs" }
-                                    ] 
-                            }
+                            { "Ref": "SubnetIDs" }
                         ]
                     }
                 }
@@ -661,21 +616,10 @@
                 "GroupDescription": "All devices external to AWS",
                 "SecurityGroupIngress": [
                     {
-                        "Fn::If": [
-                            "UsePrivateSubnetsCondition",
-                            {
-                                "IpProtocol": "tcp",
-                                "FromPort": "22",
-                                "ToPort": "22", 
-                                "SourceSecurityGroupId": { "Ref": "SSHSecurityGroupID" } 
-                            },
-                            {
-                                "IpProtocol": "tcp",
-                                "FromPort": "22",
-                                "ToPort": "22",                             
-                                "CidrIp": { "Ref": "RemoteAccessCIDR" } 
-                            }
-                        ]
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22", 
+                        "SourceSecurityGroupId": { "Ref": "SSHSecurityGroupID" } 
                     }
                 ]
             }
@@ -729,70 +673,6 @@
                 "Timeout": "300",
                 "Count": "1"
             }
-        },
-        "PrimaryELB": {
-            "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
-            "DependsOn": ["MessageRouterPrimaryStack"],
-            "Condition": "UsePrivateSubnetsCondition",
-            "Properties":{
-                "SecurityGroups": [{ "Ref" : "MessageRouterSecurityGroup"}],
-                "Subnets" : [
-                    {"Fn::Select":
-                        [
-                            0,
-                            { "Ref": "PublicSubnetIDs" }
-                        ]
-                    }
-                ],
-                "Instances" : [{"Fn::GetAtt": ["MessageRouterPrimaryStack","Outputs.EC2ID"]}],          
-                "Listeners" : [ 
-                    {
-                    "LoadBalancerPort" : "55555",
-                    "InstancePort" : "55555",
-                    "Protocol" : "TCP"
-                    },{
-                    "LoadBalancerPort" : "1883",
-                    "InstancePort" : "1883",
-                    "Protocol" : "TCP"                    
-                    },{               
-                    "LoadBalancerPort" : "8080",
-                    "InstancePort" : "8080",
-                    "Protocol" : "HTTP"                    
-                    } 
-                ]
-            }
-        },
-         "BackupELB": {
-            "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
-            "DependsOn": ["MessageRouterBackupStack"],
-            "Condition": "UsePrivateSubnetsCondition",
-            "Properties":{
-                "SecurityGroups": [{ "Ref" : "MessageRouterSecurityGroup"}],
-                "Subnets" : [
-                    {"Fn::Select":
-                        [
-                            1,
-                            { "Ref": "PublicSubnetIDs" }
-                        ]
-                    }
-                ],
-                "Instances" : [{"Fn::GetAtt": ["MessageRouterBackupStack","Outputs.EC2ID"]}],
-                "Listeners" : [ 
-                    {
-                    "LoadBalancerPort" : "55555",
-                    "InstancePort" : "55555",
-                    "Protocol" : "TCP"
-                    },{
-                    "LoadBalancerPort" : "1883",
-                    "InstancePort" : "1883",
-                    "Protocol" : "TCP"                    
-                    },{               
-                    "LoadBalancerPort" : "8080",
-                    "InstancePort" : "8080",
-                    "Protocol" : "HTTP"                    
-                    } 
-                ]
-            }
-        }       
+        }
     }
 }
