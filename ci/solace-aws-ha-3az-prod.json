@@ -5,7 +5,7 @@
     },
     {
         "ParameterKey": "AdminPassword",
-        "ParameterValue": "admin"
+        "ParameterValue": "$[alfred_genpass_10]"
     },
     {
         "ParameterKey": "AvailabilityZones",
@@ -36,11 +36,11 @@
         "ParameterValue": "$[alfred_getkeypair]"
     },
     {
-        "ParameterKey": "QSS3BucketName",
-        "ParameterValue": "quickstart-reference"
+        "ParameterKey": "RemoteAccessCIDR",
+        "ParameterValue": "10.0.0.0/16"
     },
     {
-        "ParameterKey": "QSS3KeyPrefix",
-        "ParameterValue": "solace/vmr/latest"
+        "ParameterKey": "SSHAccessCIDR",
+        "ParameterValue": "10.0.0.0/16"
     }
 ]
