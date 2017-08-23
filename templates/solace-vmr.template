@@ -391,7 +391,7 @@
                     "KeyPairName": {
                         "Ref": "KeyPairName"
                     },
-                    "NodeDesignation": "message-router-primary",
+                    "NodeDesignation": "MessageRouterPrimary",
                     "NodeInstanceType": {
                         "Ref": "MessageRouterNodeInstanceType"
                     },
@@ -463,7 +463,7 @@
                     "KeyPairName": {
                         "Ref": "KeyPairName"
                     },
-                    "NodeDesignation": "message-router-backup",
+                    "NodeDesignation": "MessageRouterBackup",
                     "NodeInstanceType": {
                         "Ref": "MessageRouterNodeInstanceType"
                     },
@@ -535,7 +535,7 @@
                     "KeyPairName": {
                         "Ref": "KeyPairName"
                     },
-                    "NodeDesignation": "monitor",
+                    "NodeDesignation": "Monitor",
                     "NodeInstanceType": {
                         "Ref": "MonitorNodeInstanceType"
                     },
