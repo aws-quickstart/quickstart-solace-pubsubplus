@@ -31,11 +31,6 @@
             "Type": "AWS::EC2::KeyPair::KeyName"
         },
         "NodeDesignation": {
-            "AllowedValues": [
-                "Monitor",
-                "MessageRouterBackup",
-                "MessageRouterPrimary"
-            ],
             "Default": "unspecified",
             "Description": "Tag for deployed instances",
             "Type": "String"
@@ -542,6 +537,28 @@
                 "IamInstanceProfile": {
                     "Ref": "InstanceProfile"
                 },
+                "Tags": [
+                    {
+                        "Key" : "Name",
+                        "Value" : {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    { "Ref": "ParentStackName" },
+                                    { "Ref": "NodeDesignation" }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Key" : "ParentStack",
+                        "Value" : { "Ref": "ParentStackName" }
+                    },
+                    {
+                        "Key" : "HARole",
+                        "Value" : { "Ref": "NodeDesignation" }
+                    }
+                ],
                 "UserData": {
                     "Fn::Base64": {
                         "Fn::Join": [
@@ -553,10 +570,10 @@
                                 "\n",
                                 "## Retrieve scripts to deploy Solace on the instances \n",
                                 "/opt/aws/bin/cfn-init -v ",
-                                "    --stack ", { "Ref": "AWS::StackName" },
+                                "    --stack ",{ "Ref": "AWS::StackName" },
                                 "    --resource NodeLaunchConfig ",
                                 "    --configsets install_all ",
-                                "    --region ", { "Ref": "AWS::Region" },
+                                "    --region ",{ "Ref": "AWS::Region" },
                                 "\n",
                                 "## Wait for all nodes to come on-line\n",
                                 "$AMI_SBIN/wait-for-child-resource.sh ",
@@ -568,27 +585,9 @@
                                 " MessageRouterPrimaryStack NodeLaunchConfig\n",
                                 "\n",
                                 "$AMI_SBIN/wait-for-child-resource.sh ",
-                                {  "Ref": "ParentStackName" },
+                                { "Ref": "ParentStackName" },
                                 " MessageRouterBackupStack NodeLaunchConfig\n",
-                                "\n",                                
-                                "## Tag the instance Name\n",
-                                "instance_id=$(curl -f http://instance-data/latest/meta-data/instance-id)\n",
-                                "instance_tag=",{ "Ref": "ParentStackName" },"-",{ "Ref": "NodeDesignation" },"\n",
-                                " \n",
-                                "aws ec2 create-tags",
-                                "    --region ",{ "Ref": "AWS::Region" },
-                                "    --resources $instance_id --tags Key=Name,Value=$instance_tag\n",
-                                "\n",
-                                "## Tag the instance Parent Stack\n",
-                                "aws ec2 create-tags",
-                                "    --region ",{ "Ref": "AWS::Region" },
-                                "    --resources $instance_id --tags Key=ParentStack,Value=",{ "Ref": "ParentStackName" },"\n",
-                                "\n",
-                                "## Tag the instance HA Role\n",
-                                "aws ec2 create-tags",
-                                "    --region ",{ "Ref": "AWS::Region" },
-                                "    --resources $instance_id --tags Key=HARole,Value=",{ "Ref": "NodeDesignation" },"\n",
-                                "\n",                               
+                                "\n",             
                                 "## Now find the private IP addresses of all deployed nodes\n",
                                 "##   (generating /tmp/solacehosts and /tmp/<role> files)\n",
                                 "$AMI_SBIN/gen-cluster-hosts.sh ",
@@ -597,11 +596,9 @@
                                 "cd /tmp\n",
                                 "# Install Solace\n",
                                 "$AMI_SBIN/install-solace.sh -c /tmp/solacehosts -d /tmp/solace",
-                                "  -u ",
-                                    { "Ref": "SolaceDockerURL" },
+                                "  -u ", { "Ref": "SolaceDockerURL" },
                                 "  -p /tmp/solOSpasswd",
-                                "  -s ",
-                                   { "Ref": "PersistentStorage" },
+                                "  -s ",{ "Ref": "PersistentStorage" },
                                 "  -v /dev/xvdb",
                                 " \n",
                                 "## Signal back information for outputs (now that all nodes are up) \n",
