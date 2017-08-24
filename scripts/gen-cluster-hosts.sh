@@ -73,18 +73,18 @@ total_nodes=$(cat ${SOLACE_HOSTS_FILE} | wc -l)
 while [ ${total_nodes} -lt 3 ]; do
 	aws ec2 describe-instances --output text --region $ThisRegion \
 	--filters 'Name=instance-state-name,Values=running,stopped' \
-	--query 'Reservations[].Instances[].[PrivateDnsName,InstanceId,LaunchTime,AmiLaunchIndex,KeyName,Tags[?Key == `aws:cloudformation:stack-name`] | [0].Value ] ' \
-	| grep -w "$ThisStack" | sort -k 3,4 \
-	| awk '{split ($1,fqdn,"."); print fqdn[1]" "$2" "$3" "$4" "$5" "$6}' \
+	--query 'Reservations[].Instances[].[PrivateIpAddress,PrivateDnsName,Tags[?Key == `HARole`] | [0].Value,Tags[?Key == `ParentStack`] | [0].Value ] ' \
+	| grep -w "$ThisStack" | sort -k 2,2 \
+	| awk '{split ($2,fqdn,"."); print $1" "fqdn[1]" "$3}' \
 	> ${SOLACE_HOSTS_FILE}
-
     total_nodes=$(cat ${SOLACE_HOSTS_FILE} | wc -l)
 done
+
 
 # We have two different Cloudformation models, one flat and one nested.
 # The different models will have slightly different labels for the 
 # nodes associated with each group ... but it's simple to handle both cases.
-#pwd
+#
 grep -q -e "-MessageRouter.*Stack-" ${SOLACE_HOSTS_FILE}
 if [ $? -eq 0 ] ; then
     grep -e "-MessageRouter.*Stack-" ${SOLACE_HOSTS_FILE} \
