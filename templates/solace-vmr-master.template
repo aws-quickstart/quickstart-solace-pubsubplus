@@ -65,7 +65,7 @@
                     "default": "Solace Docker URL"
                 },
                 "AdminPassword": {
-                    "default": "Password to access SolOS admin console and SEMP"
+                    "default": "SolOS admin console password"
                 },
                 "AvailabilityZones": {
                     "default": "Availability Zones"
@@ -103,7 +103,7 @@
             "Type": "String"
         },
         "AdminPassword": {
-            "Description": "Require password to access SolOS admin console and SEMP",
+            "Description": "Password to access SolOS admin console and SEMP",
             "NoEcho": "true",
             "Type": "String"
         },

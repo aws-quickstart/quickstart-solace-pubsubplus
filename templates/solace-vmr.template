@@ -52,7 +52,7 @@
                     "default": "Solace Docker URL"
                 },
                 "AdminPassword": {
-                    "default": "Password to access SolOS admin console and SEMP"
+                    "default": "SolOS admin console password"
                 },                
                 "BootDiskSize": {
                     "default": "Boot Disk Capacity (GiB)"
@@ -76,7 +76,7 @@
                     "default": "Allowed External Access CIDR"
                 },
                 "SSHSecurityGroupID": {
-                    "default": "Security group allowed to access console ssh"
+                    "default": "SSH Security Group ID"
                 },
                 "VPCID": {
                     "default": "VPC ID"
@@ -95,11 +95,11 @@
     },
     "Parameters": {
         "SolaceDockerURL": {
-            "Description": "Require URL to enterprise or Evaluation VMR, not Community",
+            "Description": "URL to Solace Docker Image obtained via registration here: http://dev.solace.com/downloads/download_vmr-ce-docker",
             "Type": "String"
         },
         "AdminPassword": {
-            "Description": "Require password to access SolOS admin console and SEMP",
+            "Description": "Password to access SolOS admin console and SEMP",
             "NoEcho": "true",
             "Type": "String"
         },
@@ -178,7 +178,7 @@
             "Type": "String"
         },
         "SSHSecurityGroupID": {
-            "Description": "ID of the SSH Security Group (e.g., sg-7f16e910)",
+            "Description": "Security group allowed to access console ssh (e.g., sg-7f16e910)",
             "Type": "AWS::EC2::SecurityGroup::Id"
         },
         "SubnetIDs": {
