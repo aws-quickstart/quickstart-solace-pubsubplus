@@ -120,7 +120,7 @@
                 "3"
             ],
             "Type": "Number"
-            },
+        },
         "BootDiskSize": {
             "ConstraintDescription": "Deployment supports 8 to 128 GB for boot volumes",
             "Default": "24",
@@ -263,7 +263,6 @@
                 }
             }
         },
-
         "BastionStack": {
             "Type": "AWS::CloudFormation::Stack",
             "DependsOn": [
@@ -331,7 +330,9 @@
             }
         },
         "SolaceStack": {
-            "DependsOn": [ "BastionStack" ],
+            "DependsOn": [
+                "BastionStack"
+            ],
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": {
@@ -387,8 +388,8 @@
                             "BastionStack",
                             "Outputs.BastionSecurityGroupID"
                         ]
-                    },                                        
-                    "SubnetIDs" : {
+                    },
+                    "SubnetIDs": {
                         "Fn::If": [
                             "Use3AZs",
                             {

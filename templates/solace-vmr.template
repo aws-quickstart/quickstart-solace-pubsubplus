@@ -5,42 +5,56 @@
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
                 {
-                    "Label": { "default": "Solace Parameters" },
+                    "Label": {
+                        "default": "Solace Parameters"
+                    },
                     "Parameters": [
                         "SolaceDockerURL",
                         "AdminPassword"
                     ]
-                },                
+                },
                 {
-                    "Label": { "default": "Network Configuration" },
+                    "Label": {
+                        "default": "Network Configuration"
+                    },
                     "Parameters": [
                         "VPCID",
-                        "NumberOfAZs",                
-                        "SubnetIDs",                     
+                        "NumberOfAZs",
+                        "SubnetIDs",
                         "RemoteAccessCIDR",
                         "SSHSecurityGroupID"
                     ]
                 },
                 {
-                    "Label": { "default": "Common Amazon EC2 Configuration" },
+                    "Label": {
+                        "default": "Common Amazon EC2 Configuration"
+                    },
                     "Parameters": [
                         "KeyPairName",
                         "BootDiskSize"
                     ]
                 },
                 {
-                    "Label": { "default": "MessageRouterInstance Configuration" },
+                    "Label": {
+                        "default": "MessageRouterInstance Configuration"
+                    },
                     "Parameters": [
                         "MessageRouterNodeInstanceType",
                         "MessageRouterNodeStorage"
                     ]
                 },
                 {
-                    "Label": { "default": "MonitorInstance Configuration" },
-                    "Parameters": [ "MonitorNodeInstanceType" ]
+                    "Label": {
+                        "default": "MonitorInstance Configuration"
+                    },
+                    "Parameters": [
+                        "MonitorNodeInstanceType"
+                    ]
                 },
                 {
-                    "Label": { "default": "AWS Quick Start Configuration" },
+                    "Label": {
+                        "default": "AWS Quick Start Configuration"
+                    },
                     "Parameters": [
                         "QSS3BucketName",
                         "QSS3KeyPrefix"
@@ -53,7 +67,7 @@
                 },
                 "AdminPassword": {
                     "default": "SolOS admin console password"
-                },                
+                },
                 "BootDiskSize": {
                     "default": "Boot Disk Capacity (GiB)"
                 },
@@ -267,13 +281,17 @@
     "Conditions": {
         "Use3AZs": {
             "Fn::Equals": [
-                {"Ref": "NumberOfAZs"},
+                {
+                    "Ref": "NumberOfAZs"
+                },
                 "3"
             ]
         },
         "GovCloudCondition": {
             "Fn::Equals": [
-                { "Ref": "AWS::Region" },
+                {
+                    "Ref": "AWS::Region"
+                },
                 "us-gov-west-1"
             ]
         }
@@ -288,7 +306,9 @@
                             "Version": "2012-10-17",
                             "Statement": [
                                 {
-                                    "Action": [ "s3:GetObject" ],
+                                    "Action": [
+                                        "s3:GetObject"
+                                    ],
                                     "Resource": {
                                         "Fn::Sub": [
                                             "arn:${Partition}:s3:::${QSS3BucketName}/${QSS3KeyPrefix}*",
@@ -333,8 +353,14 @@
                 "AssumeRolePolicyDocument": {
                     "Statement": [
                         {
-                            "Action": [ "sts:AssumeRole" ],
-                            "Principal": { "Service": [ "ec2.amazonaws.com" ] },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com"
+                                ]
+                            },
                             "Effect": "Allow"
                         }
                     ],
@@ -346,7 +372,11 @@
             "Type": "AWS::IAM::InstanceProfile",
             "Properties": {
                 "Path": "/",
-                "Roles": [ { "Ref": "SolaceVMRRole" } ]
+                "Roles": [
+                    {
+                        "Ref": "SolaceVMRRole"
+                    }
+                ]
             }
         },
         "MessageRouterPrimaryStack": {
@@ -393,12 +423,20 @@
                         "Fn::Join": [
                             ",",
                             [
-                                { "Ref" : "MessageRouterSecurityGroup" },
-                                { "Ref" : "SolaceInternalSecurityGroup" },
-                                { "Ref" : "SolaceInternalSecurityGroupMember" },
-                                { "Ref" : "RemoteMgmtSecurityGroup" }
+                                {
+                                    "Ref": "MessageRouterSecurityGroup"
+                                },
+                                {
+                                    "Ref": "SolaceInternalSecurityGroup"
+                                },
+                                {
+                                    "Ref": "SolaceInternalSecurityGroupMember"
+                                },
+                                {
+                                    "Ref": "RemoteMgmtSecurityGroup"
+                                }
                             ]
-                        ]    
+                        ]
                     },
                     "ParentStackName": {
                         "Ref": "AWS::StackName"
@@ -415,7 +453,9 @@
                     "SubnetID": {
                         "Fn::Select": [
                             0,
-                            { "Ref": "SubnetIDs" }
+                            {
+                                "Ref": "SubnetIDs"
+                            }
                         ]
                     }
                 }
@@ -465,12 +505,20 @@
                         "Fn::Join": [
                             ",",
                             [
-                                { "Ref" : "MessageRouterSecurityGroup" },
-                                { "Ref" : "SolaceInternalSecurityGroup" },
-                                { "Ref" : "SolaceInternalSecurityGroupMember" },
-                                { "Ref" : "RemoteMgmtSecurityGroup" }
+                                {
+                                    "Ref": "MessageRouterSecurityGroup"
+                                },
+                                {
+                                    "Ref": "SolaceInternalSecurityGroup"
+                                },
+                                {
+                                    "Ref": "SolaceInternalSecurityGroupMember"
+                                },
+                                {
+                                    "Ref": "RemoteMgmtSecurityGroup"
+                                }
                             ]
-                        ]    
+                        ]
                     },
                     "ParentStackName": {
                         "Ref": "AWS::StackName"
@@ -487,13 +535,15 @@
                     "SubnetID": {
                         "Fn::Select": [
                             1,
-                            { "Ref": "SubnetIDs" }
+                            {
+                                "Ref": "SubnetIDs"
+                            }
                         ]
                     }
                 }
             }
         },
-        "MonitorStack" :{
+        "MonitorStack": {
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": {
@@ -537,11 +587,17 @@
                         "Fn::Join": [
                             ",",
                             [
-                                { "Ref" : "SolaceInternalSecurityGroup" },
-                                { "Ref" : "SolaceInternalSecurityGroupMember" },
-                                { "Ref" : "RemoteMgmtSecurityGroup" }
+                                {
+                                    "Ref": "SolaceInternalSecurityGroup"
+                                },
+                                {
+                                    "Ref": "SolaceInternalSecurityGroupMember"
+                                },
+                                {
+                                    "Ref": "RemoteMgmtSecurityGroup"
+                                }
                             ]
-                        ]    
+                        ]
                     },
                     "ParentStackName": {
                         "Ref": "AWS::StackName"
@@ -555,14 +611,22 @@
                     },
                     "SubnetID": {
                         "Fn::Select": [
-                            { "Fn::If": ["Use3AZs", 2, 1] },
-                            { "Ref": "SubnetIDs" }
+                            {
+                                "Fn::If": [
+                                    "Use3AZs",
+                                    2,
+                                    1
+                                ]
+                            },
+                            {
+                                "Ref": "SubnetIDs"
+                            }
                         ]
                     }
                 }
             }
         },
-         "SolaceInternalSecurityGroupMember": {
+        "SolaceInternalSecurityGroupMember": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
                 "VpcId": {
@@ -570,10 +634,12 @@
                 },
                 "GroupDescription": "All Solace Nodes"
             }
-        },       
+        },
         "SolaceInternalSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
-            "DependsOn": [ "SolaceInternalSecurityGroupMember" ],
+            "DependsOn": [
+                "SolaceInternalSecurityGroupMember"
+            ],
             "Properties": {
                 "VpcId": {
                     "Ref": "VPCID"
@@ -583,20 +649,26 @@
                     {
                         "IpProtocol": "tcp",
                         "FromPort": "8741",
-                        "ToPort": "8741", 
-                        "SourceSecurityGroupId": { "Ref": "SolaceInternalSecurityGroupMember" } 
+                        "ToPort": "8741",
+                        "SourceSecurityGroupId": {
+                            "Ref": "SolaceInternalSecurityGroupMember"
+                        }
                     },
                     {
                         "IpProtocol": "tcp",
                         "FromPort": "8300",
-                        "ToPort": "8302", 
-                        "SourceSecurityGroupId": { "Ref": "SolaceInternalSecurityGroupMember" } 
+                        "ToPort": "8302",
+                        "SourceSecurityGroupId": {
+                            "Ref": "SolaceInternalSecurityGroupMember"
+                        }
                     },
                     {
                         "IpProtocol": "udp",
                         "FromPort": "8300",
-                        "ToPort": "8302", 
-                        "SourceSecurityGroupId": { "Ref": "SolaceInternalSecurityGroupMember" } 
+                        "ToPort": "8302",
+                        "SourceSecurityGroupId": {
+                            "Ref": "SolaceInternalSecurityGroupMember"
+                        }
                     }
                 ]
             }
@@ -612,8 +684,10 @@
                     {
                         "IpProtocol": "tcp",
                         "FromPort": "22",
-                        "ToPort": "22", 
-                        "SourceSecurityGroupId": { "Ref": "SSHSecurityGroupID" } 
+                        "ToPort": "22",
+                        "SourceSecurityGroupId": {
+                            "Ref": "SSHSecurityGroupID"
+                        }
                     }
                 ]
             }
@@ -658,12 +732,16 @@
         },
         "ClusterInfoCondition": {
             "Type": "AWS::CloudFormation::WaitCondition",
-            "DependsOn": ["MessageRouterPrimaryStack", "MessageRouterBackupStack", "MonitorStack"],
+            "DependsOn": [
+                "MessageRouterPrimaryStack",
+                "MessageRouterBackupStack",
+                "MonitorStack"
+            ],
             "Properties": {
                 "Handle": {
                     "Ref": "ClusterInfoHandle"
                 },
-                "Timeout": "3600",
+                "Timeout": "600",
                 "Count": "1"
             }
         }
