@@ -6,7 +6,7 @@
             "ParameterGroups": [
                 {
                     "Label": {
-                        "default": "Solace Parameters"
+                        "default": "Solace Configuration"
                     },
                     "Parameters": [
                         "SolaceDockerURL",
@@ -35,7 +35,7 @@
                 },
                 {
                     "Label": {
-                        "default": "MessageRouterInstance Configuration"
+                        "default": "Message Router Instance Configuration"
                     },
                     "Parameters": [
                         "MessageRouterNodeInstanceType",
@@ -44,7 +44,7 @@
                 },
                 {
                     "Label": {
-                        "default": "MonitorInstance Configuration"
+                        "default": "Monitor Instance Configuration"
                     },
                     "Parameters": [
                         "MonitorNodeInstanceType"
@@ -65,7 +65,7 @@
                     "default": "Solace Docker URL"
                 },
                 "AdminPassword": {
-                    "default": "SolOS admin console password"
+                    "default": "SolOS Admin Console Password"
                 },
                 "AvailabilityZones": {
                     "default": "Availability Zones"
@@ -88,6 +88,12 @@
                 "KeyPairName": {
                     "default": "Key Pair Name"
                 },
+                "SSHAccessCIDR": {
+                    "default": "Permitted IP range for SSH Access"
+                },
+                "RemoteAccessCIDR": {
+                    "default": "Allowed External Access CIDR"
+                },
                 "QSS3BucketName": {
                     "default": "Quick Start S3 Bucket Name"
                 },
@@ -103,7 +109,7 @@
             "Type": "String"
         },
         "AdminPassword": {
-            "Description": "Password to access SolOS admin console and SEMP",
+            "Description": "The password to access the SoIOS CLI console and the Solace Element Management Protocol (SEMP) API for managing message routers.",
             "NoEcho": "true",
             "Type": "String"
         },
@@ -189,7 +195,7 @@
             ],
             "ConstraintDescription": "Must be a valid EC2 instance type.",
             "Default": "t2.large",
-            "Description": "Instance Type for Solace Message Router",
+            "Description": "EC2 instance type for the Solace VMR monitor instance",
             "Type": "String"
         },
         "QSS3BucketName": {
