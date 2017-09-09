@@ -105,7 +105,7 @@
     },
     "Parameters": {
         "SolaceDockerURL": {
-            "Description": "URL to Solace Docker Image obtained via registration here: http://dev.solace.com/downloads/download_vmr-ce-docker",
+            "Description": "URL to Solace Docker Image obtained via registration here: http://dev.solace.com/downloads/download-vmr-evaluation-edition-docker",
             "Type": "String"
         },
         "AdminPassword": {
