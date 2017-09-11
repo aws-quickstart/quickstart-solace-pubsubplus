@@ -1,7 +1,7 @@
 # quickstart-solace-vmr
 ## Solace Virtual Message Router (VMR) on the AWS Cloud
 
-This Quick Start deploys Solace Virtual Message Router (VMR) on the AWS Cloud in a highly available (HA)cluster.
+This Quick Start deploys Solace Virtual Message Router (VMR) on the AWS Cloud in a highly available (HA) cluster.
 
 The Solace VMR is an implementation of the Solace SolOS messaging technology that runs on general-purpose processors in data centers, developers’ laptops, Internet of Things (IoT) gateways, the cloud, and other enterprise environments.
 
