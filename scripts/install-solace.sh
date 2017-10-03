@@ -212,7 +212,7 @@ mate_active_check=""
 echo "`date` INFO: Wait for Primary to be 'Local Active' or 'Mate Active'"
 if [ "${is_primary}" = "true" ]; then
   while [ ${count} -lt ${loop_guard} ]; do 
-    online_results=`./semp_query.sh -n admin -p ${admin_password} -u http://localhost:8080/SEMP \
+    online_results=`/tmp/semp_query.sh -n admin -p ${admin_password} -u http://localhost:8080/SEMP \
          -q "<rpc semp-version='soltr/8_5VMR'><show><redundancy><detail/></redundancy></show></rpc>" \
          -v "/rpc-reply/rpc/show/redundancy/virtual-routers/primary/status/activity[text()]"`
 
