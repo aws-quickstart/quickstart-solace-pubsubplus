@@ -111,8 +111,7 @@ local_role=`echo $host_info | grep -o -E 'Monitor|MessageRouterPrimary|MessageRo
 for role in Monitor MessageRouterPrimary MessageRouterBackup
 do 
     role_info=`grep ${role} ${config_file}`
-    role_name=${role_info%% *}
-    role_ip=`echo ${role_name} | cut -c 4- | tr "-" .`
+    role_ip=${role_info%% *}
     case $role in  
         Monitor )
             MONITOR_IP=${role_ip}
@@ -248,7 +247,7 @@ if [ "${is_primary}" = "true" ]; then
   count=0
   echo "`date` INFO: Wait for Backup to be 'Active' or 'Standby'"
   while [ ${count} -lt ${loop_guard} ]; do 
-    online_results=`./semp_query.sh -n admin -p ${admin_password} -u http://localhost:8080/SEMP \
+    online_results=`/tmp/semp_query.sh -n admin -p ${admin_password} -u http://localhost:8080/SEMP \
          -q "<rpc semp-version='soltr/8_5VMR'><show><redundancy><detail/></redundancy></show></rpc>" \
          -v "/rpc-reply/rpc/show/redundancy/virtual-routers/primary/status/detail/priority-reported-by-mate/summary[text()]"`
 
