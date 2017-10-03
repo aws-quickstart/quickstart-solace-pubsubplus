@@ -688,6 +688,14 @@
                         "SourceSecurityGroupId": {
                             "Ref": "SSHSecurityGroupID"
                         }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "2222",
+                        "ToPort": "2222",
+                        "SourceSecurityGroupId": {
+                            "Ref": "SSHSecurityGroupID"
+                        }
                     }
                 ]
             }
