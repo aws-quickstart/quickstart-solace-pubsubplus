@@ -736,15 +736,22 @@
         }
     },
     "Outputs": {
-        "EC2ID": {
-            "Description": "Reference to created ec2 instance",
+        "PublicDnsName": {
+            "Description": "Public DNS of the Instance",
             "Value": {
-                "Ref": "NodeLaunchConfig"
-            },
-            "Export": {
-                "Name": {
-                    "Fn::Sub": "${AWS::StackName}-EC2ID"
-                }
+                "Fn::GetAtt": [
+                    "NodeLaunchConfig",
+                    "PublicDnsName"
+                ]
+            }
+        },
+        "PrivateIp": {
+            "Description": "Private IP of the Instance",
+            "Value": {
+                "Fn::GetAtt": [
+                    "NodeLaunchConfig",
+                    "PrivateIp"
+                ]
             }
         }
     }

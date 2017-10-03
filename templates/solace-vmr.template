@@ -753,5 +753,61 @@
                 "Count": "1"
             }
         }
+    },
+    "Outputs": {
+        "PrimaryPublicDnsName": {
+            "Description": "Public DNS of the Primary VMR",
+            "Value": {
+                "Fn::GetAtt": [
+                    "MessageRouterPrimaryStack",
+                    "Outputs.PublicDnsName"
+                ]
+            }
+        },
+        "PrimaryPrivateIp": {
+            "Description": "Private IP of the Primary VMR",
+            "Value": {
+                "Fn::GetAtt": [
+                    "MessageRouterPrimaryStack",
+                    "Outputs.PrivateIp"
+                ]
+            }
+        },
+        "BackupPublicDnsName": {
+            "Description": "Public DNS of the Backup VMR",
+            "Value": {
+                "Fn::GetAtt": [
+                    "MessageRouterBackupStack",
+                    "Outputs.PublicDnsName"
+                ]
+            }
+        },
+        "BackupyPrivateIp": {
+            "Description": "Private IP of the Backup VMR",
+            "Value": {
+                "Fn::GetAtt": [
+                    "MessageRouterBackupStack",
+                    "Outputs.PrivateIp"
+                ]
+            }
+        },
+        "MonitorPublicDnsName": {
+            "Description": "Public DNS of the Monitor node",
+            "Value": {
+                "Fn::GetAtt": [
+                    "MessageRouterBackupStack",
+                    "Outputs.PublicDnsName"
+                ]
+            }
+        },
+        "MonitorPrivateIp": {
+            "Description": "Private IP of the Monitor node",
+            "Value": {
+                "Fn::GetAtt": [
+                    "MonitorStack",
+                    "Outputs.PrivateIp"
+                ]
+            }
+        }
     }
 }
