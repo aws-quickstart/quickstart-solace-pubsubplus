@@ -674,7 +674,7 @@
                         "IpProtocol": "tcp",
                         "FromPort": "55555",
                         "ToPort": "55555",
-                        "CidrIp": {
+                        "SourceSecurityGroupId": {
                             "Ref": "SolaceInternalSecurityGroupMember"
                         }
                     }
