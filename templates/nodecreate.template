@@ -104,7 +104,7 @@
                 "AMZNLINUXHVM": "ami-ceafcba8"
             },
             "ap-northeast-2": {
-                "AMZNLINUXHVM": "ami-942dd1f6"
+                "AMZNLINUXHVM": "ami-863090e8"
             },
             "ap-south-1": {
                 "AMZNLINUXHVM": "ami-531a4c3c"
@@ -126,6 +126,9 @@
             },
             "eu-west-2": {
                 "AMZNLINUXHVM": "ami-403e2524"
+            },
+            "eu-west-3": {
+                "AMZNLINUXHVM": "ami-8ee056f3"
             },
             "eu-central-1": {
                 "AMZNLINUXHVM": "ami-5652ce39"
