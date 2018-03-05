@@ -1,60 +1,49 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "CloudFormation template to deploy Solace HA Message Routers on AWS. (qs-1nju7g5r0)",
+    "Description": "CloudFormation template to deploy Solace HA Message Routers on AWS",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
                 {
-                    "Label": {
-                        "default": "Solace Configuration"
-                    },
+                    "Label": { "default": "Solace Parameters" },
                     "Parameters": [
                         "SolaceDockerURL",
-                        "AdminPassword"
+                        "AdminPassword",
+                        "ContainerLoggingFormat"
                     ]
                 },
                 {
-                    "Label": {
-                        "default": "Network Configuration"
-                    },
+                    "Label": { "default": "Network Configuration" },
                     "Parameters": [
                         "VPCID",
                         "NumberOfAZs",
-                        "SubnetIDs",
+                        "UsePrivateSubnets",
+                        "PublicSubnetIDs",
+                        "PrivateSubnetIDs",
                         "RemoteAccessCIDR",
                         "SSHSecurityGroupID"
                     ]
                 },
                 {
-                    "Label": {
-                        "default": "Common Amazon EC2 Configuration"
-                    },
+                    "Label": { "default": "Common Amazon EC2 Configuration" },
                     "Parameters": [
                         "KeyPairName",
                         "BootDiskSize"
                     ]
                 },
                 {
-                    "Label": {
-                        "default": "Message Router Instance Configuration"
-                    },
+                    "Label": { "default": "MessageRouterInstance Configuration" },
                     "Parameters": [
                         "MessageRouterNodeInstanceType",
                         "MessageRouterNodeStorage"
                     ]
                 },
                 {
-                    "Label": {
-                        "default": "Monitor Instance Configuration"
-                    },
-                    "Parameters": [
-                        "MonitorNodeInstanceType"
-                    ]
+                    "Label": { "default": "MonitorInstance Configuration" },
+                    "Parameters": [ "MonitorNodeInstanceType" ]
                 },
                 {
-                    "Label": {
-                        "default": "AWS Quick Start Configuration"
-                    },
+                    "Label": { "default": "AWS Quick Start Configuration" },
                     "Parameters": [
                         "QSS3BucketName",
                         "QSS3KeyPrefix"
@@ -66,7 +55,10 @@
                     "default": "Solace Docker URL"
                 },
                 "AdminPassword": {
-                    "default": "SolOS Admin Console Password"
+                    "default": "Password to access SolOS admin console and SEMP"
+                },
+                "ContainerLoggingFormat": {
+                    "default": "Container logging format"
                 },
                 "BootDiskSize": {
                     "default": "Boot Disk Capacity (GiB)"
@@ -84,18 +76,24 @@
                     "default": "Key Pair Name"
                 },
                 "NumberOfAZs": {
-                    "default": "Number of Availability Zones"
+                    "default": "Number of Availability Zones to use"
                 },
                 "RemoteAccessCIDR": {
                     "default": "Allowed External Access CIDR"
                 },
                 "SSHSecurityGroupID": {
-                    "default": "SSH Security Group ID"
+                    "default": "Security group allowed to access console ssh"
+                },
+                "UsePrivateSubnets": {
+                    "default": "Use private subnets"
                 },
                 "VPCID": {
                     "default": "VPC ID"
                 },
-                "SubnetIDs": {
+                "PrivateSubnetIDs": {
+                    "default": "Private Subnet IDs"
+                },
+                "PublicSubnetIDs": {
                     "default": "Public Subnet IDs"
                 },
                 "QSS3BucketName": {
@@ -109,12 +107,23 @@
     },
     "Parameters": {
         "SolaceDockerURL": {
-            "Description": "URL to Solace Docker Image obtained via registration here: http://dev.solace.com/downloads/download-vmr-evaluation-edition-docker",
+            "Description": "Required URL to enterprise or Evaluation VMR, not Community",
             "Type": "String"
         },
         "AdminPassword": {
-            "Description": "The password to access the SoIOS CLI console and the Solace Element Management Protocol (SEMP) API for managing message routers.",
-            "NoEcho": "true",
+            "Description": "Required password to access SolOS admin console and SEMP",
+            "Type": "String"
+        },
+        "ContainerLoggingFormat": {
+            "AllowedValues": [
+                "graylog",
+                "legacy",
+                "raw",
+                "rfc5424"
+            ],
+            "ConstraintDescription": "Must be a valid container logging format.",
+            "Default": "graylog",
+            "Description": "Solace VMR logging format in CloudWatch",
             "Type": "String"
         },
         "BootDiskSize": {
@@ -133,11 +142,13 @@
                 "m3.xlarge",
                 "m4.large",
                 "m4.xlarge",
+                "m4.2xlarge",
+                "m4.4xlarge",
                 "c4.xlarge"
             ],
             "ConstraintDescription": "Must be a valid EC2 instance type.",
             "Default": "t2.large",
-            "Description": "Instance Type for Solace Message Router",
+            "Description": "Instance Type for Solace Message Router. Note: Make sure that your region supports the selected instance type before continuing",
             "Type": "String"
         },
         "MessageRouterNodeStorage": {
@@ -168,7 +179,7 @@
             ],
             "ConstraintDescription": "Must be a valid EC2 instance type.",
             "Default": "t2.large",
-            "Description": "EC2 instance type for the Solace VMR monitor instance",
+            "Description": "Instance Type for Solace Message Router. Note: Make sure that your region supports the selected instance type before continuing",
             "Type": "String"
         },
         "KeyPairName": {
@@ -192,10 +203,23 @@
             "Type": "String"
         },
         "SSHSecurityGroupID": {
-            "Description": "Security group allowed to access console ssh (e.g., sg-7f16e910)",
+            "Description": "ID of the SSH Security Group (e.g., sg-7f16e910)",
             "Type": "AWS::EC2::SecurityGroup::Id"
         },
-        "SubnetIDs": {
+        "UsePrivateSubnets": {
+            "AllowedValues": [
+                "true",
+                "false"
+            ],
+            "Default": "true",
+            "Description": "Whether to use Private Subnets with fronting Bastion Servers",
+            "Type": "String"
+        },
+        "PrivateSubnetIDs": {
+            "Description": "Comma separated list of VPC private subnet IDs for the cluster deployment (e.g. subnet-4b8d329f,subnet-bd73afc8); VPC must exist with proper configuration for Solace cluster access. Note: This will be skipped if 'Use private subnets' is set to 'false'",
+            "Type": "List<AWS::EC2::Subnet::Id>"
+        },
+         "PublicSubnetIDs": {
             "Description": "Comma separated list of VPC public subnet IDs for the cluster deployment (e.g. subnet-4b8d329f,subnet-bd73afc8); VPC must exist with proper configuration for Solace cluster access",
             "Type": "List<AWS::EC2::Subnet::Id>"
         },
@@ -206,14 +230,14 @@
         "QSS3BucketName": {
             "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
             "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
-            "Default": "quickstart-reference",
+            "Default": "solace-products",
             "Description": "S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
             "Type": "String"
         },
         "QSS3KeyPrefix": {
             "AllowedPattern": "^[0-9a-zA-Z-/]*$",
             "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
-            "Default": "solace/vmr/latest/",
+            "Default": "solace-aws-ha-quickstart/latest/",
             "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
             "Type": "String"
         }
@@ -279,19 +303,27 @@
         }
     },
     "Conditions": {
+        "EnableWaitConditions": {
+            "Fn::Equals": [
+                "1",
+                "1"
+            ]
+        },
         "Use3AZs": {
             "Fn::Equals": [
-                {
-                    "Ref": "NumberOfAZs"
-                },
+                {"Ref": "NumberOfAZs"},
                 "3"
+            ]
+        },
+        "UsePrivateSubnetsCondition": {
+            "Fn::Equals": [
+                { "Ref": "UsePrivateSubnets" },
+                "true"
             ]
         },
         "GovCloudCondition": {
             "Fn::Equals": [
-                {
-                    "Ref": "AWS::Region"
-                },
+                { "Ref": "AWS::Region" },
                 "us-gov-west-1"
             ]
         }
@@ -306,9 +338,7 @@
                             "Version": "2012-10-17",
                             "Statement": [
                                 {
-                                    "Action": [
-                                        "s3:GetObject"
-                                    ],
+                                    "Action": [ "s3:GetObject" ],
                                     "Resource": {
                                         "Fn::Sub": [
                                             "arn:${Partition}:s3:::${QSS3BucketName}/${QSS3KeyPrefix}*",
@@ -347,20 +377,34 @@
                             ]
                         },
                         "PolicyName": "ec2-policy"
+                    },
+                    {
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents",
+                                        "logs:DescribeLogStreams"
+                                    ],
+                                    "Resource": [
+                                        "arn:aws:logs:*:*:*"
+                                    ],
+                                    "Effect": "Allow"
+                                }
+                            ]
+                        },
+                        "PolicyName": "cloudwatch-policy"
                     }
                 ],
                 "Path": "/",
                 "AssumeRolePolicyDocument": {
                     "Statement": [
                         {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ],
-                            "Principal": {
-                                "Service": [
-                                    "ec2.amazonaws.com"
-                                ]
-                            },
+                            "Action": [ "sts:AssumeRole" ],
+                            "Principal": { "Service": [ "ec2.amazonaws.com" ] },
                             "Effect": "Allow"
                         }
                     ],
@@ -372,11 +416,7 @@
             "Type": "AWS::IAM::InstanceProfile",
             "Properties": {
                 "Path": "/",
-                "Roles": [
-                    {
-                        "Ref": "SolaceVMRRole"
-                    }
-                ]
+                "Roles": [ { "Ref": "SolaceVMRRole" } ]
             }
         },
         "MessageRouterPrimaryStack": {
@@ -403,6 +443,9 @@
                     "AdminPassword": {
                         "Ref": "AdminPassword"
                     },
+                    "ContainerLoggingFormat": {
+                        "Ref": "ContainerLoggingFormat"
+                    },
                     "BootDiskSize": {
                         "Ref": "BootDiskSize"
                     },
@@ -415,7 +458,7 @@
                     "KeyPairName": {
                         "Ref": "KeyPairName"
                     },
-                    "NodeDesignation": "MessageRouterPrimary",
+                    "NodeDesignation": "message-router-primary",
                     "NodeInstanceType": {
                         "Ref": "MessageRouterNodeInstanceType"
                     },
@@ -423,20 +466,12 @@
                         "Fn::Join": [
                             ",",
                             [
-                                {
-                                    "Ref": "MessageRouterSecurityGroup"
-                                },
-                                {
-                                    "Ref": "SolaceInternalSecurityGroup"
-                                },
-                                {
-                                    "Ref": "SolaceInternalSecurityGroupMember"
-                                },
-                                {
-                                    "Ref": "RemoteMgmtSecurityGroup"
-                                }
+                                { "Ref" : "MessageRouterSecurityGroup" },
+                                { "Ref" : "SolaceInternalSecurityGroup" },
+                                { "Ref" : "SolaceInternalSecurityGroupMember" },
+                                { "Ref" : "RemoteMgmtSecurityGroup" }
                             ]
-                        ]
+                        ]    
                     },
                     "ParentStackName": {
                         "Ref": "AWS::StackName"
@@ -453,8 +488,12 @@
                     "SubnetID": {
                         "Fn::Select": [
                             0,
-                            {
-                                "Ref": "SubnetIDs"
+                            { 
+                                "Fn::If": [
+                                    "UsePrivateSubnetsCondition",
+                                    { "Ref": "PrivateSubnetIDs" }, 
+                                    { "Ref": "PublicSubnetIDs" }
+                                    ] 
                             }
                         ]
                     }
@@ -485,6 +524,9 @@
                     "AdminPassword": {
                         "Ref": "AdminPassword"
                     },
+                    "ContainerLoggingFormat": {
+                        "Ref": "ContainerLoggingFormat"
+                    },
                     "BootDiskSize": {
                         "Ref": "BootDiskSize"
                     },
@@ -497,7 +539,7 @@
                     "KeyPairName": {
                         "Ref": "KeyPairName"
                     },
-                    "NodeDesignation": "MessageRouterBackup",
+                    "NodeDesignation": "message-router-backup",
                     "NodeInstanceType": {
                         "Ref": "MessageRouterNodeInstanceType"
                     },
@@ -505,20 +547,12 @@
                         "Fn::Join": [
                             ",",
                             [
-                                {
-                                    "Ref": "MessageRouterSecurityGroup"
-                                },
-                                {
-                                    "Ref": "SolaceInternalSecurityGroup"
-                                },
-                                {
-                                    "Ref": "SolaceInternalSecurityGroupMember"
-                                },
-                                {
-                                    "Ref": "RemoteMgmtSecurityGroup"
-                                }
+                                { "Ref" : "MessageRouterSecurityGroup" },
+                                { "Ref" : "SolaceInternalSecurityGroup" },
+                                { "Ref" : "SolaceInternalSecurityGroupMember" },
+                                { "Ref" : "RemoteMgmtSecurityGroup" }
                             ]
-                        ]
+                        ]    
                     },
                     "ParentStackName": {
                         "Ref": "AWS::StackName"
@@ -535,15 +569,19 @@
                     "SubnetID": {
                         "Fn::Select": [
                             1,
-                            {
-                                "Ref": "SubnetIDs"
+                            { 
+                                "Fn::If": [
+                                    "UsePrivateSubnetsCondition",
+                                    { "Ref": "PrivateSubnetIDs" }, 
+                                    { "Ref": "PublicSubnetIDs" }
+                                    ] 
                             }
                         ]
                     }
                 }
             }
         },
-        "MonitorStack": {
+        "MonitorStack" :{
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": {
@@ -567,6 +605,9 @@
                     "AdminPassword": {
                         "Ref": "AdminPassword"
                     },
+                    "ContainerLoggingFormat": {
+                        "Ref": "ContainerLoggingFormat"
+                    },
                     "BootDiskSize": {
                         "Ref": "BootDiskSize"
                     },
@@ -579,7 +620,7 @@
                     "KeyPairName": {
                         "Ref": "KeyPairName"
                     },
-                    "NodeDesignation": "Monitor",
+                    "NodeDesignation": "monitor",
                     "NodeInstanceType": {
                         "Ref": "MonitorNodeInstanceType"
                     },
@@ -587,17 +628,11 @@
                         "Fn::Join": [
                             ",",
                             [
-                                {
-                                    "Ref": "SolaceInternalSecurityGroup"
-                                },
-                                {
-                                    "Ref": "SolaceInternalSecurityGroupMember"
-                                },
-                                {
-                                    "Ref": "RemoteMgmtSecurityGroup"
-                                }
+                                { "Ref" : "SolaceInternalSecurityGroup" },
+                                { "Ref" : "SolaceInternalSecurityGroupMember" },
+                                { "Ref" : "RemoteMgmtSecurityGroup" }
                             ]
-                        ]
+                        ]    
                     },
                     "ParentStackName": {
                         "Ref": "AWS::StackName"
@@ -611,22 +646,20 @@
                     },
                     "SubnetID": {
                         "Fn::Select": [
-                            {
+                            { "Fn::If": ["Use3AZs", 2, 1] },
+                            { 
                                 "Fn::If": [
-                                    "Use3AZs",
-                                    2,
-                                    1
-                                ]
-                            },
-                            {
-                                "Ref": "SubnetIDs"
+                                    "UsePrivateSubnetsCondition",
+                                    { "Ref": "PrivateSubnetIDs" }, 
+                                    { "Ref": "PublicSubnetIDs" }
+                                    ] 
                             }
                         ]
                     }
                 }
             }
         },
-        "SolaceInternalSecurityGroupMember": {
+         "SolaceInternalSecurityGroupMember": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
                 "VpcId": {
@@ -634,12 +667,10 @@
                 },
                 "GroupDescription": "All Solace Nodes"
             }
-        },
+        },       
         "SolaceInternalSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
-            "DependsOn": [
-                "SolaceInternalSecurityGroupMember"
-            ],
+            "DependsOn": [ "SolaceInternalSecurityGroupMember" ],
             "Properties": {
                 "VpcId": {
                     "Ref": "VPCID"
@@ -649,34 +680,74 @@
                     {
                         "IpProtocol": "tcp",
                         "FromPort": "8741",
-                        "ToPort": "8741",
-                        "SourceSecurityGroupId": {
-                            "Ref": "SolaceInternalSecurityGroupMember"
-                        }
+                        "ToPort": "8741", 
+                        "SourceSecurityGroupId": { "Ref": "SolaceInternalSecurityGroupMember" } 
                     },
                     {
                         "IpProtocol": "tcp",
                         "FromPort": "8300",
-                        "ToPort": "8302",
-                        "SourceSecurityGroupId": {
-                            "Ref": "SolaceInternalSecurityGroupMember"
-                        }
+                        "ToPort": "8302", 
+                        "SourceSecurityGroupId": { "Ref": "SolaceInternalSecurityGroupMember" } 
                     },
                     {
                         "IpProtocol": "udp",
                         "FromPort": "8300",
-                        "ToPort": "8302",
-                        "SourceSecurityGroupId": {
-                            "Ref": "SolaceInternalSecurityGroupMember"
-                        }
+                        "ToPort": "8302", 
+                        "SourceSecurityGroupId": { "Ref": "SolaceInternalSecurityGroupMember" } 
                     },
                     {
                         "IpProtocol": "tcp",
                         "FromPort": "55555",
                         "ToPort": "55555",
-                        "SourceSecurityGroupId": {
-                            "Ref": "SolaceInternalSecurityGroupMember"
-                        }
+                        "SourceSecurityGroupId": { "Ref": "SolaceInternalSecurityGroupMember" } 
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "55003",
+                        "ToPort": "55003",
+                        "SourceSecurityGroupId": { "Ref": "SolaceInternalSecurityGroupMember" } 
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "8000",
+                        "ToPort": "8000",
+                        "SourceSecurityGroupId": { "Ref": "SolaceInternalSecurityGroupMember" } 
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "5672",
+                        "ToPort": "5672",
+                        "SourceSecurityGroupId": { "Ref": "SolaceInternalSecurityGroupMember" } 
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "9000",
+                        "ToPort": "9000",
+                        "SourceSecurityGroupId": { "Ref": "SolaceInternalSecurityGroupMember" } 
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "1883",
+                        "ToPort": "1883",
+                        "SourceSecurityGroupId": { "Ref": "SolaceInternalSecurityGroupMember" } 
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "80",
+                        "ToPort": "80",
+                        "SourceSecurityGroupId": { "Ref": "SolaceInternalSecurityGroupMember" } 
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "8080",
+                        "ToPort": "8080",
+                        "SourceSecurityGroupId": { "Ref": "SolaceInternalSecurityGroupMember" } 
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "5550",
+                        "ToPort": "5550",
+                        "SourceSecurityGroupId": { "Ref": "SolaceInternalSecurityGroupMember" } 
                     }
                 ]
             }
@@ -690,20 +761,21 @@
                 "GroupDescription": "All devices external to AWS",
                 "SecurityGroupIngress": [
                     {
-                        "IpProtocol": "tcp",
-                        "FromPort": "22",
-                        "ToPort": "22",
-                        "SourceSecurityGroupId": {
-                            "Ref": "SSHSecurityGroupID"
-                        }
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "2222",
-                        "ToPort": "2222",
-                        "SourceSecurityGroupId": {
-                            "Ref": "SSHSecurityGroupID"
-                        }
+                        "Fn::If": [
+                            "UsePrivateSubnetsCondition",
+                            {
+                                "IpProtocol": "tcp",
+                                "FromPort": "22",
+                                "ToPort": "22", 
+                                "SourceSecurityGroupId": { "Ref": "SSHSecurityGroupID" } 
+                            },
+                            {
+                                "IpProtocol": "tcp",
+                                "FromPort": "22",
+                                "ToPort": "22",                             
+                                "CidrIp": { "Ref": "RemoteAccessCIDR" } 
+                            }
+                        ]
                     }
                 ]
             }
@@ -726,6 +798,38 @@
                     },
                     {
                         "IpProtocol": "tcp",
+                        "FromPort": "55003",
+                        "ToPort": "55003",
+                        "CidrIp": {
+                            "Ref": "RemoteAccessCIDR"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "8000",
+                        "ToPort": "8000",
+                        "CidrIp": {
+                            "Ref": "RemoteAccessCIDR"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "5672",
+                        "ToPort": "5672",
+                        "CidrIp": {
+                            "Ref": "RemoteAccessCIDR"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "9000",
+                        "ToPort": "9000",
+                        "CidrIp": {
+                            "Ref": "RemoteAccessCIDR"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
                         "FromPort": "1883",
                         "ToPort": "1883",
                         "CidrIp": {
@@ -739,6 +843,14 @@
                         "CidrIp": {
                             "Ref": "RemoteAccessCIDR"
                         }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "80",
+                        "ToPort": "80",
+                        "CidrIp": {
+                            "Ref": "RemoteAccessCIDR"
+                        }
                     }
                 ]
             }
@@ -748,72 +860,74 @@
         },
         "ClusterInfoCondition": {
             "Type": "AWS::CloudFormation::WaitCondition",
-            "DependsOn": [
-                "MessageRouterPrimaryStack",
-                "MessageRouterBackupStack",
-                "MonitorStack"
-            ],
+            "Condition": "EnableWaitConditions",
+            "DependsOn": ["MessageRouterPrimaryStack", "MessageRouterBackupStack", "MonitorStack"],
             "Properties": {
                 "Handle": {
                     "Ref": "ClusterInfoHandle"
                 },
-                "Timeout": "600",
+                "Timeout": "300",
                 "Count": "1"
             }
-        }
-    },
-    "Outputs": {
-        "PrimaryPublicDnsName": {
-            "Description": "Public DNS of the Primary VMR",
-            "Value": {
-                "Fn::GetAtt": [
-                    "MessageRouterPrimaryStack",
-                    "Outputs.PublicDnsName"
-                ]
-            }
         },
-        "PrimaryPrivateIp": {
-            "Description": "Private IP of the Primary VMR",
-            "Value": {
-                "Fn::GetAtt": [
-                    "MessageRouterPrimaryStack",
-                    "Outputs.PrivateIp"
-                ]
-            }
-        },
-        "BackupPublicDnsName": {
-            "Description": "Public DNS of the Backup VMR",
-            "Value": {
-                "Fn::GetAtt": [
-                    "MessageRouterBackupStack",
-                    "Outputs.PublicDnsName"
-                ]
-            }
-        },
-        "BackupyPrivateIp": {
-            "Description": "Private IP of the Backup VMR",
-            "Value": {
-                "Fn::GetAtt": [
-                    "MessageRouterBackupStack",
-                    "Outputs.PrivateIp"
-                ]
-            }
-        },
-        "MonitorPublicDnsName": {
-            "Description": "Public DNS of the Monitor node",
-            "Value": {
-                "Fn::GetAtt": [
-                    "MessageRouterBackupStack",
-                    "Outputs.PublicDnsName"
-                ]
-            }
-        },
-        "MonitorPrivateIp": {
-            "Description": "Private IP of the Monitor node",
-            "Value": {
-                "Fn::GetAtt": [
-                    "MonitorStack",
-                    "Outputs.PrivateIp"
+        "ELB": {
+            "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+            "DependsOn": ["MessageRouterPrimaryStack"],
+            "Condition": "UsePrivateSubnetsCondition",
+            "Properties":{
+                "SecurityGroups": [
+                    { "Ref" : "MessageRouterSecurityGroup" },
+                    { "Ref" : "SolaceInternalSecurityGroupMember" }
+                ],
+                "Subnets" : { "Ref": "PublicSubnetIDs" },
+                "Instances" : [
+                    {"Fn::GetAtt": ["MessageRouterPrimaryStack","Outputs.EC2ID"]},
+                    {"Fn::GetAtt": ["MessageRouterBackupStack","Outputs.EC2ID"]},
+                    {"Fn::GetAtt": ["MonitorStack","Outputs.EC2ID"]}
+                ],
+                "HealthCheck" : {
+                    "Target" : {
+                        "Fn::Join" : [ "", [ "HTTP:", 5550, "/health-check/guaranteed-active" ] ]
+                    },
+                    "Timeout" : "3",
+                    "Interval" : "5",
+                    "UnhealthyThreshold" : "2",
+                    "HealthyThreshold" : "2",
+                },
+                "Listeners" : [
+                    {
+                    "LoadBalancerPort" : "55555",
+                    "InstancePort" : "55555",
+                    "Protocol" : "TCP"
+                    },{
+                    "LoadBalancerPort" : "55003",
+                    "InstancePort" : "55003",
+                    "Protocol" : "TCP"
+                    },{
+                    "LoadBalancerPort" : "8000",
+                    "InstancePort" : "8000",
+                    "Protocol" : "TCP"
+                    },{
+                    "LoadBalancerPort" : "5672",
+                    "InstancePort" : "5672",
+                    "Protocol" : "TCP"
+                    },{
+                    "LoadBalancerPort" : "9000",
+                    "InstancePort" : "9000",
+                    "Protocol" : "TCP"
+                    },{
+                    "LoadBalancerPort" : "1883",
+                    "InstancePort" : "1883",
+                    "Protocol" : "TCP"
+                    },{
+                    "LoadBalancerPort" : "80",
+                    "InstancePort" : "80",
+                    "Protocol" : "HTTP"
+                    },{
+                    "LoadBalancerPort" : "8080",
+                    "InstancePort" : "8080",
+                    "Protocol" : "HTTP"
+                    }
                 ]
             }
         }
