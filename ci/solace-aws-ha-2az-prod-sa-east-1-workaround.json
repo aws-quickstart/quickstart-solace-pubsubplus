@@ -1,0 +1,58 @@
+[
+    {
+        "ParameterKey": "SolaceDockerURL",
+        "ParameterValue": "http://em.solace.com/kC0Wd0Y00ow00BiT910x40I"
+    },
+    {
+        "ParameterKey": "AdminPassword",
+        "ParameterValue": "$[alfred_genpass_10]"
+    },
+    {
+        "ParameterKey": "ContainerLoggingFormat",
+        "ParameterValue": "graylog"
+    },
+    {
+        "ParameterKey": "NumberOfAZs",
+        "ParameterValue": "2"
+    },
+    {
+        "ParameterKey": "AvailabilityZones",
+        "ParameterValue": "sa-east-1a, sa-east-1c"
+    },
+    {
+        "ParameterKey": "CreatePrivateSubnets",
+        "ParameterValue": "true" 
+    },
+    {
+        "ParameterKey": "BootDiskSize",
+        "ParameterValue": "24"
+    },
+    {
+        "ParameterKey": "MessageRouterNodeInstanceType",
+        "ParameterValue": "t2.large"
+    },
+    {
+        "ParameterKey": "MessageRouterNodeStorage",
+        "ParameterValue": "0"
+    },
+    {
+        "ParameterKey": "MonitorNodeInstanceType",
+        "ParameterValue": "t2.large"
+    },
+    {
+        "ParameterKey": "KeyPairName",
+        "ParameterValue": "$[alfred_getkeypair]"
+    },
+    {
+        "ParameterKey": "RemoteAccessCIDR",
+        "ParameterValue": "10.0.0.0/0"
+    },
+    {
+        "ParameterKey": "SSHAccessCIDR",
+        "ParameterValue": "10.0.0.0/0"
+    },
+    {
+        "ParameterKey": "QSS3BucketName",
+        "ParameterValue": "bczoma-s3-1"
+    }
+]
