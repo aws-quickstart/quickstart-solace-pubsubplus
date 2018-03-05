@@ -1,19 +1,27 @@
 [
     {
         "ParameterKey": "SolaceDockerURL",
-        "ParameterValue": "$[alfred_getlicensecontent]/solace/vmr/evaluation_url.key"
+        "ParameterValue": "http://em.solace.com/kC0Wd0Y00ow00BiT910x40I"
     },
     {
         "ParameterKey": "AdminPassword",
         "ParameterValue": "$[alfred_genpass_10]"
     },
     {
-        "ParameterKey": "AvailabilityZones",
-        "ParameterValue": "$[alfred_genaz_3]" 
+        "ParameterKey": "ContainerLoggingFormat",
+        "ParameterValue": "graylog"
     },
     {
         "ParameterKey": "NumberOfAZs",
         "ParameterValue": "3"
+    },
+    {
+        "ParameterKey": "AvailabilityZones",
+        "ParameterValue": "$[alfred_genaz_3]" 
+    },
+    {
+        "ParameterKey": "CreatePrivateSubnets",
+        "ParameterValue": "true" 
     },
     {
         "ParameterKey": "BootDiskSize",
@@ -21,15 +29,15 @@
     },
     {
         "ParameterKey": "MessageRouterNodeInstanceType",
-        "ParameterValue": "m4.large"
+        "ParameterValue": "t2.large"
     },
     {
         "ParameterKey": "MessageRouterNodeStorage",
-        "ParameterValue": "0"
+        "ParameterValue": "20"
     },
     {
         "ParameterKey": "MonitorNodeInstanceType",
-        "ParameterValue": "m4.large"
+        "ParameterValue": "t2.large"
     },
     {
         "ParameterKey": "KeyPairName",
@@ -37,10 +45,14 @@
     },
     {
         "ParameterKey": "RemoteAccessCIDR",
-        "ParameterValue": "10.0.0.0/16"
+        "ParameterValue": "10.0.0.0/0"
     },
     {
         "ParameterKey": "SSHAccessCIDR",
-        "ParameterValue": "10.0.0.0/16"
+        "ParameterValue": "10.0.0.0/0"
+    },
+    {
+        "ParameterKey": "QSS3BucketName",
+        "ParameterValue": "bczoma-s3-1"
     }
 ]
