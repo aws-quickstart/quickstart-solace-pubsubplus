@@ -112,7 +112,8 @@
         },
         "AdminPassword": {
             "Description": "Require password to access SolOS admin console and SEMP",
-            "Type": "String"
+            "Type": "String",
+            "NoEcho": "True"
         },
         "ContainerLoggingFormat": {
             "AllowedValues": [
@@ -371,7 +372,6 @@
             }
         },
         "SolaceStack": {
-            "DependsOn": [ "BastionStack" ],
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": {
@@ -429,11 +429,17 @@
                         "Ref": "CreatePrivateSubnets"  
                     },
                     "SSHSecurityGroupID": {
-                        "Fn::GetAtt": [
-                            "BastionStack",
-                            "Outputs.BastionSecurityGroupID"
+                        "Fn::If": [
+                            "UsePrivateSubnets",
+                            {
+                                "Fn::GetAtt": [
+                                    "BastionStack",
+                                    "Outputs.BastionSecurityGroupID"
+                                ]
+                            },
+                            "default"
                         ]
-                    },                                        
+                    },
                     "PrivateSubnetIDs" : {
                         "Fn::If": [
                             "UsePrivateSubnets",
@@ -486,7 +492,12 @@
                                     }
                                 ]
                             },
-                            {}
+                            {
+                                "Fn::GetAtt": [
+                                    "VPCStack",
+                                    "Outputs.PublicSubnet1ID"
+                                ]
+                            }
                         ]
                     },
                     "PublicSubnetIDs" : {
