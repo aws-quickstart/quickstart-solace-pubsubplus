@@ -168,7 +168,7 @@
         "MessageRouterNodeStorage": {
             "ConstraintDescription": "No more than 640 GiB per device.",
             "Default": "0",
-            "Description": "Allocated EBS storage for each block device (in GiB); 0 indicates ephemeral storage only",
+            "Description": "Allocated EBS storage for each block device (in GiB); 0 indicates ephemeral storage only. Non-zero will cause a new io1 disk creation for message-spool which will NOT be deleted on stack termination",
             "AllowedValues": [
                 "0",
                 "20",
@@ -177,7 +177,7 @@
                 "160",
                 "320",
                 "640"
-            ],
+            ], 
             "Type": "Number"
         },
         "KeyPairName": {

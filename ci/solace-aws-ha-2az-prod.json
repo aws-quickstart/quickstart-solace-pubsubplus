@@ -33,7 +33,7 @@
     },
     {
         "ParameterKey": "MessageRouterNodeStorage",
-        "ParameterValue": "20"
+        "ParameterValue": "0"
     },
     {
         "ParameterKey": "MonitorNodeInstanceType",

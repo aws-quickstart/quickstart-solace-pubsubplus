@@ -46,6 +46,7 @@ tests:
       - us-east-1
       - us-east-2
       - us-west-2
+      - sa-east-1
   2az-europe:
     parameter_input: solace-aws-ha-2az-prod.json
     template_file: solace-vmr-master.template
@@ -58,8 +59,3 @@ tests:
     regions:
       - eu-west-1
       - eu-central-1
-  fix-sa-east-1-americas:
-    parameter_input: solace-aws-ha-2az-prod-sa-east-1-workaround.json
-    template_file: solace-vmr-master.template
-    regions:
-      - sa-east-1
