@@ -8,7 +8,8 @@
         },
         "AdminPassword": {
             "Description": "Required password to access SolOS admin console and SEMP",
-            "Type": "String"
+            "Type": "String",
+            "NoEcho": "True"
         },
         "ContainerLoggingFormat": {
             "AllowedValues": [

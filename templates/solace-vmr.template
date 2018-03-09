@@ -112,7 +112,8 @@
         },
         "AdminPassword": {
             "Description": "Required password to access SolOS admin console and SEMP",
-            "Type": "String"
+            "Type": "String",
+            "NoEcho": "True"
         },
         "ContainerLoggingFormat": {
             "AllowedValues": [
@@ -203,8 +204,8 @@
             "Type": "String"
         },
         "SSHSecurityGroupID": {
-            "Description": "ID of the SSH Security Group (e.g., sg-7f16e910)",
-            "Type": "AWS::EC2::SecurityGroup::Id"
+            "Description": "ID of the SSH Security Group (e.g., sg-7f16e910).  Note: This will be ignored if 'Use private subnets' is set to 'false'",
+            "Type": "String"
         },
         "UsePrivateSubnets": {
             "AllowedValues": [
@@ -216,7 +217,7 @@
             "Type": "String"
         },
         "PrivateSubnetIDs": {
-            "Description": "Comma separated list of VPC private subnet IDs for the cluster deployment (e.g. subnet-4b8d329f,subnet-bd73afc8); VPC must exist with proper configuration for Solace cluster access. Note: This will be skipped if 'Use private subnets' is set to 'false'",
+            "Description": "Comma separated list of VPC private subnet IDs for the cluster deployment (e.g. subnet-4b8d329f,subnet-bd73afc8); VPC must exist with proper configuration for Solace cluster access. Note: This will be ignored if 'Use private subnets' is set to 'false'",
             "Type": "List<AWS::EC2::Subnet::Id>"
         },
          "PublicSubnetIDs": {
