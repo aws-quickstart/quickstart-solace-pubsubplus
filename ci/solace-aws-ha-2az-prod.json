@@ -8,12 +8,20 @@
         "ParameterValue": "$[alfred_genpass_10]"
     },
     {
-        "ParameterKey": "AvailabilityZones",
-        "ParameterValue": "$[alfred_genaz_2]" 
+        "ParameterKey": "ContainerLoggingFormat",
+        "ParameterValue": "graylog"
     },
     {
         "ParameterKey": "NumberOfAZs",
         "ParameterValue": "2"
+    },
+    {
+        "ParameterKey": "AvailabilityZones",
+        "ParameterValue": "$[alfred_genaz_2]" 
+    },
+    {
+        "ParameterKey": "CreatePrivateSubnets",
+        "ParameterValue": "true" 
     },
     {
         "ParameterKey": "BootDiskSize",
@@ -21,7 +29,7 @@
     },
     {
         "ParameterKey": "MessageRouterNodeInstanceType",
-        "ParameterValue": "m4.large"
+        "ParameterValue": "t2.large"
     },
     {
         "ParameterKey": "MessageRouterNodeStorage",
@@ -29,7 +37,7 @@
     },
     {
         "ParameterKey": "MonitorNodeInstanceType",
-        "ParameterValue": "m4.large"
+        "ParameterValue": "t2.large"
     },
     {
         "ParameterKey": "KeyPairName",
@@ -42,5 +50,5 @@
     {
         "ParameterKey": "SSHAccessCIDR",
         "ParameterValue": "10.0.0.0/16"
-    }
+    },
 ]

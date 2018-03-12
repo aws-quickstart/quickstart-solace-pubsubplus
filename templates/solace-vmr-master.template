@@ -6,11 +6,12 @@
             "ParameterGroups": [
                 {
                     "Label": {
-                        "default": "Solace Configuration"
+                        "default": "Solace Parameters"
                     },
                     "Parameters": [
                         "SolaceDockerURL",
-                        "AdminPassword"
+                        "AdminPassword",
+                        "ContainerLoggingFormat"
                     ]
                 },
                 {
@@ -18,8 +19,9 @@
                         "default": "Network Configuration"
                     },
                     "Parameters": [
-                        "AvailabilityZones",
                         "NumberOfAZs",
+                        "AvailabilityZones",
+                        "CreatePrivateSubnets",
                         "SSHAccessCIDR",
                         "RemoteAccessCIDR"
                     ]
@@ -35,7 +37,7 @@
                 },
                 {
                     "Label": {
-                        "default": "Message Router Instance Configuration"
+                        "default": "MessageRouterInstance Configuration"
                     },
                     "Parameters": [
                         "MessageRouterNodeInstanceType",
@@ -44,7 +46,7 @@
                 },
                 {
                     "Label": {
-                        "default": "Monitor Instance Configuration"
+                        "default": "MonitorInstance Configuration"
                     },
                     "Parameters": [
                         "MonitorNodeInstanceType"
@@ -65,7 +67,10 @@
                     "default": "Solace Docker URL"
                 },
                 "AdminPassword": {
-                    "default": "SolOS Admin Console Password"
+                    "default": "Password to access SolOS admin console and SEMP"
+                },
+                "ContainerLoggingFormat": {
+                    "default": "Container logging format"
                 },
                 "AvailabilityZones": {
                     "default": "Availability Zones"
@@ -88,11 +93,8 @@
                 "KeyPairName": {
                     "default": "Key Pair Name"
                 },
-                "SSHAccessCIDR": {
-                    "default": "Permitted IP range for SSH Access"
-                },
-                "RemoteAccessCIDR": {
-                    "default": "Allowed External Access CIDR"
+                "CreatePrivateSubnets": {
+                    "default": "Create production ready enviroment"
                 },
                 "QSS3BucketName": {
                     "default": "Quick Start S3 Bucket Name"
@@ -105,16 +107,28 @@
     },
     "Parameters": {
         "SolaceDockerURL": {
-            "Description": "URL to Solace Docker Image obtained via registration here: http://dev.solace.com/downloads/download-vmr-evaluation-edition-docker",
+            "Description": "URL to Solace Docker Image obtained via registration here: http://dev.solace.com/downloads/download_vmr-ce-docker",
             "Type": "String"
         },
         "AdminPassword": {
-            "Description": "The password to access the SoIOS CLI console and the Solace Element Management Protocol (SEMP) API for managing message routers.",
-            "NoEcho": "true",
+            "Description": "Require password to access SolOS admin console and SEMP",
+            "Type": "String",
+            "NoEcho": "True"
+        },
+        "ContainerLoggingFormat": {
+            "AllowedValues": [
+                "graylog",
+                "legacy",
+                "raw",
+                "rfc5424"
+            ],
+            "ConstraintDescription": "Must be a valid container logging format.",
+            "Default": "graylog",
+            "Description": "Solace VMR logging format in CloudWatch",
             "Type": "String"
         },
         "AvailabilityZones": {
-            "Description": "List of Availability Zones to use for the subnets in the VPC. Note: The logical order is preserved exctly 3 AZs are used for this deployment.",
+            "Description": "List of Availability Zones to use for the subnets in the VPC. Note: The logical order is preserved. The number of zones to choose should be equal to 'Number of Availability Zones' previously specified",
             "Type": "List<AWS::EC2::AvailabilityZone::Name>"
         },
         "NumberOfAZs": {
@@ -137,24 +151,25 @@
         },
         "MessageRouterNodeInstanceType": {
             "AllowedValues": [
-                "t2.medium",
                 "t2.large",
                 "t2.xlarge",
                 "m3.large",
                 "m3.xlarge",
                 "m4.large",
                 "m4.xlarge",
+                "m4.2xlarge",
+                "m4.4xlarge",
                 "c4.xlarge"
             ],
             "ConstraintDescription": "Must be a valid EC2 instance type.",
             "Default": "t2.large",
-            "Description": "Instance Type for Solace Message Router",
+            "Description": "Instance Type for Solace Message Router. Note: Make sure that your region supports the selected instance type before continuing",
             "Type": "String"
         },
         "MessageRouterNodeStorage": {
             "ConstraintDescription": "No more than 640 GiB per device.",
             "Default": "0",
-            "Description": "Allocated EBS storage for each block device (in GiB); 0 indicates ephemeral storage only",
+            "Description": "Allocated EBS storage for each block device (in GiB); 0 indicates ephemeral storage only. Non-zero will cause a new io1 disk creation for message-spool which will NOT be deleted on stack termination",
             "AllowedValues": [
                 "0",
                 "20",
@@ -163,12 +178,21 @@
                 "160",
                 "320",
                 "640"
-            ],
+            ], 
             "Type": "Number"
         },
         "KeyPairName": {
             "Description": "Name of an existing EC2 key pair within the AWS region; all instances will launch with this key pair",
             "Type": "AWS::EC2::KeyPair::KeyName"
+        },
+        "CreatePrivateSubnets": {
+            "AllowedValues": [
+                "true",
+                "false"
+            ],
+            "Default": "true",
+            "Description": "Whether to create and use Private Subnets with a fronting ELB",
+            "Type": "String"
         },
         "RemoteAccessCIDR": {
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$",
@@ -195,7 +219,7 @@
             ],
             "ConstraintDescription": "Must be a valid EC2 instance type.",
             "Default": "t2.large",
-            "Description": "EC2 instance type for the Solace VMR monitor instance",
+            "Description": "Instance Type for Solace Message Router. Note: Make sure that your region supports the selected instance type before continuing",
             "Type": "String"
         },
         "QSS3BucketName": {
@@ -221,6 +245,14 @@
                     "Ref": "NumberOfAZs"
                 },
                 "3"
+            ]
+        },
+        "UsePrivateSubnets": {
+            "Fn::Equals": [
+                {
+                    "Ref": "CreatePrivateSubnets"
+                },
+                "true"
             ]
         },
         "GovCloudCondition": {
@@ -259,7 +291,9 @@
                             }
                         ]
                     },
-                    "CreatePrivateSubnets": "false",
+                    "CreatePrivateSubnets": {
+                        "Ref": "CreatePrivateSubnets"
+                    },
                     "KeyPairName": {
                         "Ref": "KeyPairName"
                     },
@@ -269,8 +303,10 @@
                 }
             }
         },
+
         "BastionStack": {
             "Type": "AWS::CloudFormation::Stack",
+            "Condition": "UsePrivateSubnets",
             "DependsOn": [
                 "VPCStack"
             ],
@@ -336,9 +372,6 @@
             }
         },
         "SolaceStack": {
-            "DependsOn": [
-                "BastionStack"
-            ],
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": {
@@ -361,6 +394,9 @@
                     },
                     "AdminPassword": {
                         "Ref": "AdminPassword"
+                    },
+                    "ContainerLoggingFormat": {
+                        "Ref": "ContainerLoggingFormat"
                     },
                     "NumberOfAZs": {
                         "Ref": "NumberOfAZs"
@@ -389,13 +425,82 @@
                     "RemoteAccessCIDR": {
                         "Ref": "RemoteAccessCIDR"
                     },
+                    "UsePrivateSubnets": {
+                        "Ref": "CreatePrivateSubnets"  
+                    },
                     "SSHSecurityGroupID": {
-                        "Fn::GetAtt": [
-                            "BastionStack",
-                            "Outputs.BastionSecurityGroupID"
+                        "Fn::If": [
+                            "UsePrivateSubnets",
+                            {
+                                "Fn::GetAtt": [
+                                    "BastionStack",
+                                    "Outputs.BastionSecurityGroupID"
+                                ]
+                            },
+                            "default"
                         ]
                     },
-                    "SubnetIDs": {
+                    "PrivateSubnetIDs" : {
+                        "Fn::If": [
+                            "UsePrivateSubnets",
+                            {
+                                "Fn::If": [
+                                    "Use3AZs",
+                                    {
+                                        "Fn::Join": [
+                                            ",",
+                                            [
+                                                {
+                                                    "Fn::GetAtt": [
+                                                        "VPCStack",
+                                                        "Outputs.PrivateSubnet1AID"
+                                                    ]
+                                                },
+                                                {
+                                                    "Fn::GetAtt": [
+                                                        "VPCStack",
+                                                        "Outputs.PrivateSubnet2AID"
+                                                    ]
+                                                },
+                                                {
+                                                    "Fn::GetAtt": [
+                                                        "VPCStack",
+                                                        "Outputs.PrivateSubnet3AID"
+                                                    ]
+                                                }
+                                            ]
+                                        ]
+                                    },
+                                    {
+                                        "Fn::Join": [
+                                            ",",
+                                            [
+                                                {
+                                                    "Fn::GetAtt": [
+                                                        "VPCStack",
+                                                        "Outputs.PrivateSubnet1AID"
+                                                    ]
+                                                },
+                                                {
+                                                    "Fn::GetAtt": [
+                                                        "VPCStack",
+                                                        "Outputs.PrivateSubnet2AID"
+                                                    ]
+                                                }
+                                            ]
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "Fn::GetAtt": [
+                                    "VPCStack",
+                                    "Outputs.PublicSubnet1ID"
+                                ]
+                            }
+                        ]
+                    },
+                    "PublicSubnetIDs" : {
                         "Fn::If": [
                             "Use3AZs",
                             {
