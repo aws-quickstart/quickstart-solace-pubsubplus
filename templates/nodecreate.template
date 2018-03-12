@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "CloudFormation sub-template for Single Node EC2 deployment within Solace HA Cluster. (qs-1nju7g5r0)",
+    "Description": "CloudFormation sub-template for Single Node EC2 deployment within Solace HA Cluster. (qs-1nm1r54hd)",
     "Parameters": {
         "SolaceDockerURL": {
             "Description": "Required URL to enterprise or Evaluation VMR, not Community",
