@@ -1,7 +1,7 @@
 [
     {
         "ParameterKey": "SolaceDockerURL",
-        "ParameterValue": "http://em.solace.com/kC0Wd0Y00ow00BiT910x40I"
+        "ParameterValue": "$[alfred_getlicensecontent]/solace/vmr/evaluation_url.key"
     },
     {
         "ParameterKey": "AdminPassword",
@@ -45,14 +45,10 @@
     },
     {
         "ParameterKey": "RemoteAccessCIDR",
-        "ParameterValue": "10.0.0.0/0"
+        "ParameterValue": "10.0.0.0/16"
     },
     {
         "ParameterKey": "SSHAccessCIDR",
-        "ParameterValue": "10.0.0.0/0"
+        "ParameterValue": "10.0.0.0/16"
     },
-    {
-        "ParameterKey": "QSS3BucketName",
-        "ParameterValue": "bczoma-s3-1"
-    }
 ]
