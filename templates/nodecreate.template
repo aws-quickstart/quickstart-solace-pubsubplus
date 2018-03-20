@@ -119,9 +119,6 @@
             "ca-central-1": {
                 "AMZNLINUXHVM": "ami-a954d1cd"
             },
-            "cn-north-1": {
-                "AMZNLINUXHVM": "ami-cb19c4a6"
-            },
             "eu-west-1": {
                 "AMZNLINUXHVM": "ami-d834aba1"
             },
