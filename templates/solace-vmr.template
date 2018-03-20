@@ -867,7 +867,7 @@
                 "Handle": {
                     "Ref": "ClusterInfoHandle"
                 },
-                "Timeout": "300",
+                "Timeout": "3600",
                 "Count": "1"
             }
         },
