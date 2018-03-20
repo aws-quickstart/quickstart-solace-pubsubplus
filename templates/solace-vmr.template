@@ -893,7 +893,7 @@
                     "Timeout" : "3",
                     "Interval" : "5",
                     "UnhealthyThreshold" : "2",
-                    "HealthyThreshold" : "2",
+                    "HealthyThreshold" : "2"
                 },
                 "Listeners" : [
                     {
