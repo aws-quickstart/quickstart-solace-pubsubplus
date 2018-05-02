@@ -6,7 +6,7 @@
             "ParameterGroups": [
                 {
                     "Label": {
-                        "default": "Solace Parameters"
+                        "default": "Solace Configuration"
                     },
                     "Parameters": [
                         "SolaceDockerURL",
@@ -37,7 +37,7 @@
                 },
                 {
                     "Label": {
-                        "default": "MessageRouterInstance Configuration"
+                        "default": "Message Router Instance Configuration"
                     },
                     "Parameters": [
                         "MessageRouterNodeInstanceType",
@@ -46,7 +46,7 @@
                 },
                 {
                     "Label": {
-                        "default": "MonitorInstance Configuration"
+                        "default": "Monitor Instance Configuration"
                     },
                     "Parameters": [
                         "MonitorNodeInstanceType"

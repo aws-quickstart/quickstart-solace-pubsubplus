@@ -5,7 +5,7 @@
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
                 {
-                    "Label": { "default": "Solace Parameters" },
+                    "Label": { "default": "Solace Configuration" },
                     "Parameters": [
                         "SolaceDockerURL",
                         "AdminPassword",
@@ -32,14 +32,14 @@
                     ]
                 },
                 {
-                    "Label": { "default": "MessageRouterInstance Configuration" },
+                    "Label": { "default": "Message Router Instance Configuration" },
                     "Parameters": [
                         "MessageRouterNodeInstanceType",
                         "MessageRouterNodeStorage"
                     ]
                 },
                 {
-                    "Label": { "default": "MonitorInstance Configuration" },
+                    "Label": { "default": "Monitor Instance Configuration" },
                     "Parameters": [ "MonitorNodeInstanceType" ]
                 },
                 {
