@@ -1,7 +1,7 @@
 [
     {
-        "ParameterKey": "SolaceDockerURL",
-        "ParameterValue": "$[taskcat_getlicensecontent]/solace/vmr/evaluation_url.key"
+        "ParameterKey": "S:wqolaceDockerURL",
+        "ParameterValue": "overrides"
     },
     {
         "ParameterKey": "AdminPassword",
