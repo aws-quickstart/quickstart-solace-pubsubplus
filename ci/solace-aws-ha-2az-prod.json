@@ -1,11 +1,11 @@
 [
     {
         "ParameterKey": "SolaceDockerURL",
-        "ParameterValue": "$[alfred_getlicensecontent]/solace/vmr/evaluation_url.key"
+        "ParameterValue": "$[taskcat_getlicensecontent]/solace/vmr/evaluation_url.key"
     },
     {
         "ParameterKey": "AdminPassword",
-        "ParameterValue": "$[alfred_genpass_10]"
+        "ParameterValue": "$[taskcat_genpass_10]"
     },
     {
         "ParameterKey": "ContainerLoggingFormat",
@@ -17,11 +17,11 @@
     },
     {
         "ParameterKey": "AvailabilityZones",
-        "ParameterValue": "$[alfred_genaz_2]" 
+        "ParameterValue": "$[taskcat_genaz_2]"
     },
     {
         "ParameterKey": "CreatePrivateSubnets",
-        "ParameterValue": "true" 
+        "ParameterValue": "true"
     },
     {
         "ParameterKey": "BootDiskSize",
@@ -41,7 +41,7 @@
     },
     {
         "ParameterKey": "KeyPairName",
-        "ParameterValue": "$[alfred_getkeypair]"
+        "ParameterValue": "cikey"
     },
     {
         "ParameterKey": "RemoteAccessCIDR",
