@@ -1,7 +1,7 @@
 [
     {
-        "ParameterKey": "SolaceDockerURL",
-        "ParameterValue": "$[alfred_getlicensecontent]/solace/vmr/evaluation_url.key"
+        "ParameterKey": "SolaceDockerImage",
+        "ParameterValue": "solace/solace-pubsub-standard:latest"
     },
     {
         "ParameterKey": "AdminPassword",

@@ -1,14 +1,14 @@
 # quickstart-solace-vmr
-## Solace Virtual Message Router (VMR) on the AWS Cloud
+## Solace PubSub+ Software Message Broker on the AWS Cloud
 
-This Quick Start deploys Solace Virtual Message Router (VMR) version 8.7 or later on the AWS Cloud in a highly available (HA) cluster.
+This Quick Start deploys Solace PubSub+ Software Message Broker version 8.7 or later on the AWS Cloud in a highly available (HA) cluster.
 
-The Solace VMR is an implementation of the Solace SolOS messaging technology that runs on general-purpose processors in data centers, developers’ laptops, Internet of Things (IoT) gateways, the cloud, and other enterprise environments.
+The Solace message broker is an implementation of the Solace SolOS messaging technology that runs on general-purpose processors in data centers, developers’ laptops, Internet of Things (IoT) gateways, the cloud, and other enterprise environments.
 
-You can use the AWS CloudFormation templates included with the Quick Start to deploy a fully configured Solace VMR HA cluster in your AWS account. The Quick Start automates the following:
+You can use the AWS CloudFormation templates included with the Quick Start to deploy a fully configured Solace PubSub+ message broker HA cluster in your AWS account. The Quick Start automates the following:
 
-- Deploying the VMR cluster into a new VPC
-- Deploying the VMR cluster into an existing VPC
+- Deploying the Solace message broker cluster into a new VPC
+- Deploying the Solace message broker cluster into an existing VPC
 
 You can also use the AWS CloudFormation templates as a starting point for your own implementation.
 
