@@ -20,8 +20,8 @@
                         "UsePrivateSubnets",
                         "PublicSubnetIDs",
                         "PrivateSubnetIDs",
-                        "SSHSecurityGroupID"
-                        "RemoteAccessCIDR",
+                        "SSHSecurityGroupID",
+                        "RemoteAccessCIDR"
                     ]
                 },
                 {
