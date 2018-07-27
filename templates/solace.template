@@ -32,10 +32,10 @@
                     ]
                 },
                 {
-                    "Label": { "default": "Message Router Instance Configuration" },
+                    "Label": { "default": "Message Broker Instance Configuration" },
                     "Parameters": [
-                        "MessageRouterNodeInstanceType",
-                        "MessageRouterNodeStorage"
+                        "MessageBrokerNodeInstanceType",
+                        "MessageBrokerNodeStorage"
                     ]
                 },
                 {
@@ -52,7 +52,7 @@
             ],
             "ParameterLabels": {
                 "SolaceDockerImage": {
-                    "default": "Solace docker image reference"
+                    "default": "Solace Docker image reference"
                 },
                 "AdminPassword": {
                     "default": "Password to access SolOS admin console and SEMP"
@@ -63,10 +63,10 @@
                 "BootDiskSize": {
                     "default": "Boot Disk Capacity (GiB)"
                 },
-                "MessageRouterNodeInstanceType": {
+                "MessageBrokerNodeInstanceType": {
                     "default": "Instance Type"
                 },
-                "MessageRouterNodeStorage": {
+                "MessageBrokerNodeStorage": {
                     "default": "Persistent Storage"
                 },
                 "MonitorNodeInstanceType": {
@@ -82,7 +82,7 @@
                     "default": "Allowed External Access CIDR"
                 },
                 "SSHSecurityGroupID": {
-                    "default": "Security group allowed to access console ssh"
+                    "default": "Security group allowed to access console SSH"
                 },
                 "UsePrivateSubnets": {
                     "default": "Use private subnets"
@@ -136,7 +136,7 @@
             "MinValue": "8",
             "Type": "Number"
         },
-        "MessageRouterNodeInstanceType": {
+        "MessageBrokerNodeInstanceType": {
             "AllowedValues": [
                 "t2.small",
                 "t2.medium",
@@ -159,7 +159,7 @@
             "Description": "Instance Type for Solace message broker message routing nodes. Note: Make sure that your region supports the selected instance type before continuing",
             "Type": "String"
         },
-        "MessageRouterNodeStorage": {
+        "MessageBrokerNodeStorage": {
             "ConstraintDescription": "No more than 640 GiB per device.",
             "Default": "0",
             "Description": "Allocated EBS storage for each block device (in GiB); 0 indicates ephemeral storage only. Non-zero will cause a new io1 disk creation for message-spool which will NOT be deleted on stack termination",
@@ -244,7 +244,7 @@
         "QSS3KeyPrefix": {
             "AllowedPattern": "^[0-9a-zA-Z-/]*$",
             "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
-            "Default": "quickstart-solace-vmr/",
+            "Default": "quickstart-solace-pubsub/",
             "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
             "Type": "String"
         }
@@ -467,7 +467,7 @@
                     },
                     "NodeDesignation": "message-router-primary",
                     "NodeInstanceType": {
-                        "Ref": "MessageRouterNodeInstanceType"
+                        "Ref": "MessageBrokerNodeInstanceType"
                     },
                     "NodeSecurityGroup": {
                         "Fn::Join": [
@@ -484,7 +484,7 @@
                         "Ref": "AWS::StackName"
                     },
                     "PersistentStorage": {
-                        "Ref": "MessageRouterNodeStorage"
+                        "Ref": "MessageBrokerNodeStorage"
                     },
                     "QSS3BucketName": {
                         "Ref": "QSS3BucketName"
@@ -548,7 +548,7 @@
                     },
                     "NodeDesignation": "message-router-backup",
                     "NodeInstanceType": {
-                        "Ref": "MessageRouterNodeInstanceType"
+                        "Ref": "MessageBrokerNodeInstanceType"
                     },
                     "NodeSecurityGroup": {
                         "Fn::Join": [
@@ -565,7 +565,7 @@
                         "Ref": "AWS::StackName"
                     },
                     "PersistentStorage": {
-                        "Ref": "MessageRouterNodeStorage"
+                        "Ref": "MessageBrokerNodeStorage"
                     },
                     "QSS3BucketName": {
                         "Ref": "QSS3BucketName"

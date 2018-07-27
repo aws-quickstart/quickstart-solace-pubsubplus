@@ -17,22 +17,22 @@
     },
     {
         "ParameterKey": "AvailabilityZones",
-        "ParameterValue": "$[alfred_genaz_3]" 
+        "ParameterValue": "$[alfred_genaz_3]"
     },
     {
         "ParameterKey": "CreatePrivateSubnets",
-        "ParameterValue": "true" 
+        "ParameterValue": "true"
     },
     {
         "ParameterKey": "BootDiskSize",
         "ParameterValue": "24"
     },
     {
-        "ParameterKey": "MessageRouterNodeInstanceType",
+        "ParameterKey": "MessageBrokerNodeInstanceType",
         "ParameterValue": "t2.small"
     },
     {
-        "ParameterKey": "MessageRouterNodeStorage",
+        "ParameterKey": "MessageBrokerNodeStorage",
         "ParameterValue": "0"
     },
     {
