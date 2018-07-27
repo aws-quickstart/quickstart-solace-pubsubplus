@@ -1,7 +1,7 @@
 global:
   marketplace-ami: false
   owner: quickstart@amazon.com
-  qsname: quickstart-solace-vmr
+  qsname: quickstart-solace-pubsub
   regions:
     - ap-northeast-1
     - ap-northeast-2
