@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "CloudFormation template to deploy Solace HA Message Routers on AWS. (qs-1nju7g5r0)",
+    "Description": "CloudFormation template to deploy Solace PubSub+ HA Message Brokers on AWS. (qs-1nju7g5r0)",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
@@ -55,7 +55,7 @@
                     "default": "Solace Docker image reference"
                 },
                 "AdminPassword": {
-                    "default": "Password to access SolOS admin console and SEMP"
+                    "default": "Password to access Solace admin console and SEMP"
                 },
                 "ContainerLoggingFormat": {
                     "default": "Container logging format"
@@ -112,7 +112,7 @@
             "Type": "String"
         },
         "AdminPassword": {
-            "Description": "Required password to access SolOS admin console and SEMP",
+            "Description": "Required password to access Solace admin console and SEMP",
             "Type": "String",
             "NoEcho": "True"
         },
@@ -426,7 +426,7 @@
                 "Roles": [ { "Ref": "SolaceVMRRole" } ]
             }
         },
-        "MessageRouterPrimaryStack": {
+        "MessageBrokerPrimaryStack": {
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": {
@@ -473,7 +473,7 @@
                         "Fn::Join": [
                             ",",
                             [
-                                { "Ref" : "MessageRouterSecurityGroup" },
+                                { "Ref" : "MessageBrokerSecurityGroup" },
                                 { "Ref" : "SolaceInternalSecurityGroup" },
                                 { "Ref" : "SolaceInternalSecurityGroupMember" },
                                 { "Ref" : "RemoteMgmtSecurityGroup" }
@@ -507,7 +507,7 @@
                 }
             }
         },
-        "MessageRouterBackupStack": {
+        "MessageBrokerBackupStack": {
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": {
@@ -554,7 +554,7 @@
                         "Fn::Join": [
                             ",",
                             [
-                                { "Ref" : "MessageRouterSecurityGroup" },
+                                { "Ref" : "MessageBrokerSecurityGroup" },
                                 { "Ref" : "SolaceInternalSecurityGroup" },
                                 { "Ref" : "SolaceInternalSecurityGroupMember" },
                                 { "Ref" : "RemoteMgmtSecurityGroup" }
@@ -787,13 +787,13 @@
                 ]
             }
         },
-        "MessageRouterSecurityGroup": {
+        "MessageBrokerSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
                 "VpcId": {
                     "Ref": "VPCID"
                 },
-                "GroupDescription": "Message Router Security Group",
+                "GroupDescription": "Message Broker Security Group",
                 "SecurityGroupIngress": [
                     {
                         "IpProtocol": "tcp",
@@ -868,7 +868,7 @@
         "ClusterInfoCondition": {
             "Type": "AWS::CloudFormation::WaitCondition",
             "Condition": "EnableWaitConditions",
-            "DependsOn": ["MessageRouterPrimaryStack", "MessageRouterBackupStack", "MonitorStack"],
+            "DependsOn": ["MessageBrokerPrimaryStack", "MessageBrokerBackupStack", "MonitorStack"],
             "Properties": {
                 "Handle": {
                     "Ref": "ClusterInfoHandle"
@@ -879,17 +879,17 @@
         },
         "ELB": {
             "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
-            "DependsOn": ["MessageRouterPrimaryStack"],
+            "DependsOn": ["MessageBrokerPrimaryStack"],
             "Condition": "UsePrivateSubnetsCondition",
             "Properties":{
                 "SecurityGroups": [
-                    { "Ref" : "MessageRouterSecurityGroup" },
+                    { "Ref" : "MessageBrokerSecurityGroup" },
                     { "Ref" : "SolaceInternalSecurityGroupMember" }
                 ],
                 "Subnets" : { "Ref": "PublicSubnetIDs" },
                 "Instances" : [
-                    {"Fn::GetAtt": ["MessageRouterPrimaryStack","Outputs.EC2ID"]},
-                    {"Fn::GetAtt": ["MessageRouterBackupStack","Outputs.EC2ID"]},
+                    {"Fn::GetAtt": ["MessageBrokerPrimaryStack","Outputs.EC2ID"]},
+                    {"Fn::GetAtt": ["MessageBrokerBackupStack","Outputs.EC2ID"]},
                     {"Fn::GetAtt": ["MonitorStack","Outputs.EC2ID"]}
                 ],
                 "HealthCheck" : {
