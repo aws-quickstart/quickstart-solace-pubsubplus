@@ -113,7 +113,7 @@
     },
     "Parameters": {
         "SolaceDockerImage": {
-            "Description": "Solace PubSub+ message broker Docker image reference: a docker registry name with optional tag or a download URL. The download URL can be obtained from http://dev.solace.com/downloads/ or it can be a url to a remotely hosted load version",
+            "Description": "Solace PubSub+ message broker Docker image reference: a Docker registry name with optional tag or a download URL. The download URL can be obtained from http://dev.solace.com/downloads/ or it can be a url to a remotely hosted load version",
             "Default": "solace/solace-pubsub-standard:latest",
             "Type": "String"
         },
