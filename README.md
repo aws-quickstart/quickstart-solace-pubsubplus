@@ -1,4 +1,4 @@
-# quickstart-solace-vmr
+# quickstart-solace-pubsub
 ## Solace PubSub+ Software Message Broker on the AWS Cloud
 
 This Quick Start deploys Solace PubSub+ Software Message Broker version 8.7 or later on the AWS Cloud in a highly available (HA) cluster.
@@ -12,7 +12,7 @@ You can use the AWS CloudFormation templates included with the Quick Start to de
 
 You can also use the AWS CloudFormation templates as a starting point for your own implementation.
 
-![Quick Start architecture for Solace VMR on AWS](https://d0.awsstatic.com/partner-network/QuickStart/datasheets/solace-on-aws-quickstart-architecture.png)
+![Quick Start architecture for Solace PubSub on AWS](https://d0.awsstatic.com/partner-network/QuickStart/datasheets/solace-on-aws-quickstart-architecture.png)
 
 For architectural details, best practices, step-by-step instructions, and customization options, see the [deployment guide](https://fwd.aws/8dKkN).
 
