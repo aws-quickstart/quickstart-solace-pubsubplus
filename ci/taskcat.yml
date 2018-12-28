@@ -39,7 +39,6 @@ tests:
     regions:
       - us-west-1
       - ca-central-1
-      - sa-east-1
   3az-americas:
     parameter_input: solace-aws-ha-3az-prod.json
     template_file: solace-master.template
