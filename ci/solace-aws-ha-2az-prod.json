@@ -8,10 +8,6 @@
         "ParameterValue": "$[alfred_genpass_10]"
     },
     {
-        "ParameterKey": "ContainerLoggingFormat",
-        "ParameterValue": "graylog"
-    },
-    {
         "ParameterKey": "NumberOfAZs",
         "ParameterValue": "2"
     },
@@ -26,10 +22,6 @@
     {
         "ParameterKey": "BootDiskSize",
         "ParameterValue": "24"
-    },
-    {
-        "ParameterKey": "MessageBrokerNodeInstanceType",
-        "ParameterValue": "t2.small"
     },
     {
         "ParameterKey": "MessageBrokerNodeStorage",
