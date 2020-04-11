@@ -24,7 +24,7 @@ tests:
     parameter_input: solace-aws-ha-2az-prod.json
     template_file: solace-master.template
     regions:
-#      - ap-northeast-2 t2.small not supported in ap-northeast-2b
+      - ap-northeast-2 t2.small not supported in ap-northeast-2b
       - ap-south-1
   3az-asia:
     parameter_input: solace-aws-ha-3az-prod.json
