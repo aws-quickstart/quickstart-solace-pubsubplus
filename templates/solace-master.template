@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >-
-  This template creates a new VPC infrastructure for Solace high availability architecture.
+  This template creates a new VPC infrastructure for PubSub+ high availability architecture.
   **WARNING** This template creates Amazon EC2 instance and related resources. You
   will be billed for the AWS resources used if you create a stack from this template.
   (qs-1nju7g5qq)
@@ -8,7 +8,7 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: Solace Configuration
+          default: PubSub+ Configuration
         Parameters:
           - SolaceDockerImage
           - AdminPassword
@@ -27,10 +27,10 @@ Metadata:
           - KeyPairName
           - BootDiskSize
       - Label:
-          default: Message Broker Instance Configuration
+          default: Event Broker Instance Configuration
         Parameters:
-          - MessageBrokerNodeInstanceType
-          - MessageBrokerNodeStorage
+          - EventBrokerNodeInstanceType
+          - EventBrokerNodeStorage
       - Label:
           default: Monitor Instance Configuration
         Parameters:
@@ -43,9 +43,9 @@ Metadata:
           - QSS3KeyPrefix
     ParameterLabels:
       SolaceDockerImage:
-        default: Solace Docker image reference
+        default: PubSub+ Docker image reference
       AdminPassword:
-        default: Password to access Solace admin console and SEMP
+        default: Password to access PubSub+ admin console and SEMP
       ContainerLoggingFormat:
         default: Container logging format
       AvailabilityZones:
@@ -54,9 +54,9 @@ Metadata:
         default: Number of Availability Zones
       BootDiskSize:
         default: Boot Disk Capacity (GiB)
-      MessageBrokerNodeInstanceType:
+      EventBrokerNodeInstanceType:
         default: Instance Type
-      MessageBrokerNodeStorage:
+      EventBrokerNodeStorage:
         default: Persistent Storage
       MonitorNodeInstanceType:
         default: Instance Type
@@ -77,13 +77,13 @@ Metadata:
 Parameters:
   SolaceDockerImage:
     Description: >-
-      Solace PubSub+ message broker Docker image reference: a Docker registry name
+      Solace PubSub+ event broker Docker image reference: a Docker registry name
       with optional tag or a download URL. The download URL can be obtained from http://dev.solace.com/downloads/
       or it can be a url to a remotely hosted load version
     Default: solace/solace-pubsub-standard:latest
     Type: String
   AdminPassword:
-    Description: Password to allow Solace admin access to configure the message broker
+    Description: Password to allow Solace admin access to configure the event broker
       instances
     Type: String
     NoEcho: 'True'
@@ -95,7 +95,7 @@ Parameters:
       - rfc5424
     ConstraintDescription: Must be a valid container logging format.
     Default: graylog
-    Description: Solace message broker logging format in CloudWatch
+    Description: PubSub+ event broker logging format in CloudWatch
     Type: String
   AvailabilityZones:
     Description: 'List of Availability Zones to use for the subnets in the VPC. Note:
@@ -118,7 +118,7 @@ Parameters:
     MaxValue: '128'
     MinValue: '8'
     Type: Number
-  MessageBrokerNodeInstanceType:
+  EventBrokerNodeInstanceType:
     AllowedValues:
       - t2.small
       - t2.medium
@@ -137,10 +137,10 @@ Parameters:
       - m5.4xlarge
     ConstraintDescription: Must be a valid EC2 instance type.
     Default: m4.large
-    Description: 'Instance Type for Solace message broker message routing nodes. Note:
+    Description: 'Instance Type for PubSub+ event broker message routing nodes. Note:
       Make sure that your region supports the selected instance type before continuing'
     Type: String
-  MessageBrokerNodeStorage:
+  EventBrokerNodeStorage:
     ConstraintDescription: No more than 640 GiB per device.
     Default: '0'
     Description: Allocated EBS storage for each block device (in GiB); 0 indicates
@@ -187,7 +187,7 @@ Parameters:
       - m5.large
     ConstraintDescription: Must be a valid EC2 instance type.
     Default: t2.micro
-    Description: 'Instance Type for Solace message broker monitoring node. Note: Make
+    Description: 'Instance Type for PubSub+ event broker monitoring node. Note: Make
       sure that your region supports the selected instance type before continuing'
     Type: String
   QSS3BucketName:
@@ -283,8 +283,8 @@ Resources:
         ContainerLoggingFormat: !Ref 'ContainerLoggingFormat'
         NumberOfAZs: !Ref 'NumberOfAZs'
         BootDiskSize: !Ref 'BootDiskSize'
-        MessageBrokerNodeInstanceType: !Ref 'MessageBrokerNodeInstanceType'
-        MessageBrokerNodeStorage: !Ref 'MessageBrokerNodeStorage'
+        EventBrokerNodeInstanceType: !Ref 'EventBrokerNodeInstanceType'
+        EventBrokerNodeStorage: !Ref 'EventBrokerNodeStorage'
         MonitorNodeInstanceType: !Ref 'MonitorNodeInstanceType'
         KeyPairName: !Ref 'KeyPairName'
         QSS3BucketName: !Ref 'QSS3BucketName'

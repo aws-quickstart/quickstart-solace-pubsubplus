@@ -4,13 +4,13 @@ Description: CloudFormation sub-template for Single Node EC2 deployment within S
 Parameters:
   SolaceDockerImage:
     Description: >-
-      Solace PubSub+ message broker docker image reference: a docker registry name
+      Solace PubSub+ event broker docker image reference: a docker registry name
       with optional tag or a download URL. The download URL can be obtained from http://dev.solace.com/downloads/
       or it can be a url to a remotely hosted load version
     Default: solace/solace-pubsub-standard:latest
     Type: String
   AdminPassword:
-    Description: Password to access Solace admin console and SEMP
+    Description: Password to access PubSub+ admin console and SEMP
     Type: String
     NoEcho: 'True'
   ContainerLoggingFormat:
@@ -21,7 +21,7 @@ Parameters:
       - rfc5424
     ConstraintDescription: Must be a valid container logging format.
     Default: graylog
-    Description: Solace message broker logging format in CloudWatch
+    Description: PubSub+ event broker logging format in CloudWatch
     Type: String
   BootDiskSize:
     ConstraintDescription: Deployment supports 8 to 128 GB for boot volumes
@@ -47,7 +47,7 @@ Parameters:
   NodeInstanceType:
     ConstraintDescription: Must be a valid EC2 instance type.
     Default: m4.large
-    Description: Instance Type for Solace PubSub+ message broker nodes
+    Description: Instance Type for Solace PubSub+ event broker nodes
     Type: String
   NodeSecurityGroup:
     Description: Comma separated list of security groups for the members of the cluster
@@ -100,7 +100,7 @@ Parameters:
     Description: >-
       Comma separated list of VPC subnet IDs for the cluster deployment (e.g. subnet-4b8d329f,subnet-bd73afc8);
       VPC must exist with proper configuration for Solacet cluster access (internal
-      and external)and the subnets must be in the same VPC as the security groups
+      and external) and the subnets must be in the same VPC as the security groups
     Type: AWS::EC2::Subnet::Id
 Mappings:
   AWSAMIRegionMap:
@@ -375,9 +375,9 @@ Resources:
         install_solace:
           commands:
             '01_create_secrets_directory':
-              command: mkdir -p /mnt/vmr/secrets
+              command: mkdir -p /mnt/pubsubplus/secrets
           files:
-            /mnt/vmr/secrets/solOSpasswd:
+            /mnt/pubsubplus/secrets/solOSpasswd:
               content: !Join
                 - ''
                 - - !Ref 'AdminPassword'
@@ -406,9 +406,9 @@ Resources:
               mode: '000755'
               owner: root
               group: root
-            /etc/init.d/solace-vmr:
+            /etc/init.d/solace-pubsubplus:
               source: !Sub
-                - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/init.d/solace-vmr
+                - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/init.d/solace-pubsubplus
                 - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
                   S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
               mode: '000755'
@@ -490,7 +490,7 @@ Resources:
             - "AMI_SBIN=/tmp\n"
             - "yum install -y aws-cfn-bootstrap\n"
             - "\n"
-            - "## Retrieve scripts to deploy Solace on the instances \n"
+            - "## Retrieve scripts to deploy PubSub+ on the instances \n"
             - '/opt/aws/bin/cfn-init -v '
             - '    --stack '
             - !Ref 'AWS::StackName'
@@ -506,11 +506,11 @@ Resources:
             - "\n"
             - '$AMI_SBIN/wait-for-child-resource.sh '
             - !Ref 'ParentStackName'
-            - " MessageBrokerPrimaryStack NodeLaunchConfig\n"
+            - " EventBrokerPrimaryStack NodeLaunchConfig\n"
             - "\n"
             - '$AMI_SBIN/wait-for-child-resource.sh '
             - !Ref 'ParentStackName'
-            - " MessageBrokerBackupStack NodeLaunchConfig\n"
+            - " EventBrokerBackupStack NodeLaunchConfig\n"
             - "\n"
             - "## Now find the private IP addresses of all deployed nodes\n"
             - "##   (generating /tmp/solacehosts and /tmp/<role> files)\n"
@@ -518,7 +518,7 @@ Resources:
             - !Ref 'ParentStackName'
             - "\n"
             - "## Tag the instance (now that we're sure of launch index)\n"
-            - "instance_id=$(curl -f http://instance-data/latest/meta-data/instance-id)\n"
+            - "instance_id=$(curl -f http://169.254.169.254/latest/meta-data/instance-id)\n"
             - instance_tag=
             - !Ref 'ParentStackName'
             - '-'
@@ -531,11 +531,11 @@ Resources:
             - "    --resources $instance_id --tags Key=Name,Value=$instance_tag\n"
             - "\n"
             - "cd /tmp\n"
-            - "# Install Solace\n"
+            - "# Install PubSub+\n"
             - $AMI_SBIN/install-solace.sh -c /tmp/solacehosts -d /tmp/solace
             - '  -u '
             - !Ref 'SolaceDockerImage'
-            - '  -p /mnt/vmr/secrets/solOSpasswd'
+            - '  -p /mnt/pubsubplus/secrets/solOSpasswd'
             - '  -s '
             - !Ref 'PersistentStorage'
             - '  -v /dev/xvdb'
@@ -547,7 +547,7 @@ Resources:
             - " \n"
             - "## Signal back information for outputs (now that all nodes are up)\
               \ \n"
-            - /opt/aws/bin/cfn-signal -e 0 -r 'Solace HA deployment complete' '
+            - /opt/aws/bin/cfn-signal -e 0 -r 'PubSub+ HA deployment complete' '
             - !Ref 'ClusterInfoHandle'
             - "'\n"
             - "\n"

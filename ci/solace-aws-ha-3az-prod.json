@@ -24,7 +24,7 @@
         "ParameterValue": "24"
     },
     {
-        "ParameterKey": "MessageBrokerNodeStorage",
+        "ParameterKey": "EventBrokerNodeStorage",
         "ParameterValue": "0"
     },
     {
