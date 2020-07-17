@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: CloudFormation template to deploy Solace PubSub+ HA Message Brokers on
+Description: CloudFormation template to deploy Solace PubSub+ HA Event Brokers on
   AWS. (qs-1nju7g5r0)
 Metadata:
   AWS::CloudFormation::Interface:
@@ -26,10 +26,10 @@ Metadata:
           - KeyPairName
           - BootDiskSize
       - Label:
-          default: Message Broker Instance Configuration
+          default: Event Broker Instance Configuration
         Parameters:
-          - MessageBrokerNodeInstanceType
-          - MessageBrokerNodeStorage
+          - EventBrokerNodeInstanceType
+          - EventBrokerNodeStorage
       - Label:
           default: Monitor Instance Configuration
         Parameters:
@@ -49,9 +49,9 @@ Metadata:
         default: Container logging format
       BootDiskSize:
         default: Boot Disk Capacity (GiB)
-      MessageBrokerNodeInstanceType:
+      EventBrokerNodeInstanceType:
         default: Instance Type
-      MessageBrokerNodeStorage:
+      EventBrokerNodeStorage:
         default: Persistent Storage
       MonitorNodeInstanceType:
         default: Instance Type
@@ -80,7 +80,7 @@ Metadata:
 Parameters:
   SolaceDockerImage:
     Description: >-
-      Solace PubSub+ message broker docker image reference: a docker registry name
+      Solace PubSub+ event broker docker image reference: a docker registry name
       with optional tag or a download URL. The download URL can be obtained from http://dev.solace.com/downloads/
       or it can be a url to a remotely hosted load version
     Default: solace/solace-pubsub-standard:latest
@@ -97,7 +97,7 @@ Parameters:
       - rfc5424
     ConstraintDescription: Must be a valid container logging format.
     Default: graylog
-    Description: Solace message broker logging format in CloudWatch
+    Description: PubSub+ event broker logging format in CloudWatch
     Type: String
   BootDiskSize:
     ConstraintDescription: Deployment supports 8 to 128 GB for boot volumes
@@ -106,7 +106,7 @@ Parameters:
     MaxValue: '128'
     MinValue: '8'
     Type: Number
-  MessageBrokerNodeInstanceType:
+  EventBrokerNodeInstanceType:
     AllowedValues:
       - t2.small
       - t2.medium
@@ -125,10 +125,10 @@ Parameters:
       - m5.4xlarge
     ConstraintDescription: Must be a valid EC2 instance type.
     Default: m4.large
-    Description: 'Instance Type for Solace message broker message routing nodes. Note:
+    Description: 'Instance Type for PubSub+ event broker message routing nodes. Note:
       Make sure that your region supports the selected instance type before continuing'
     Type: String
-  MessageBrokerNodeStorage:
+  EventBrokerNodeStorage:
     ConstraintDescription: No more than 640 GiB per device.
     Default: '0'
     Description: Allocated EBS storage for each block device (in GiB); 0 indicates
@@ -154,7 +154,7 @@ Parameters:
       - m5.large
     ConstraintDescription: Must be a valid EC2 instance type.
     Default: t2.micro
-    Description: 'Instance Type for Solace message broker monitoring node. Note: Make
+    Description: 'Instance Type for PubSub+ event broker monitoring node. Note: Make
       sure that your region supports the selected instance type before continuing'
     Type: String
   KeyPairName:
@@ -334,7 +334,7 @@ Resources:
       Path: /
       Roles:
         - !Ref 'SolaceVMRRole'
-  MessageBrokerPrimaryStack:
+  EventBrokerPrimaryStack:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL:
@@ -351,15 +351,15 @@ Resources:
         InstanceProfile: !Ref 'InstanceProfile'
         KeyPairName: !Ref 'KeyPairName'
         NodeDesignation: message-router-primary
-        NodeInstanceType: !Ref 'MessageBrokerNodeInstanceType'
+        NodeInstanceType: !Ref 'EventBrokerNodeInstanceType'
         NodeSecurityGroup: !Join
           - ','
-          - - !Ref 'MessageBrokerSecurityGroup'
+          - - !Ref 'EventBrokerSecurityGroup'
             - !Ref 'SolaceInternalSecurityGroup'
             - !Ref 'SolaceInternalSecurityGroupMember'
             - !Ref 'RemoteMgmtSecurityGroup'
         ParentStackName: !Ref 'AWS::StackName'
-        PersistentStorage: !Ref 'MessageBrokerNodeStorage'
+        PersistentStorage: !Ref 'EventBrokerNodeStorage'
         QSS3BucketName: !Ref 'QSS3BucketName'
         QSS3BucketRegion: !Ref 'QSS3BucketRegion'
         QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
@@ -369,7 +369,7 @@ Resources:
             - UsePrivateSubnetsCondition
             - !Ref 'PrivateSubnetIDs'
             - !Ref 'PublicSubnetIDs'
-  MessageBrokerBackupStack:
+  EventBrokerBackupStack:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL:
@@ -386,15 +386,15 @@ Resources:
         InstanceProfile: !Ref 'InstanceProfile'
         KeyPairName: !Ref 'KeyPairName'
         NodeDesignation: message-router-backup
-        NodeInstanceType: !Ref 'MessageBrokerNodeInstanceType'
+        NodeInstanceType: !Ref 'EventBrokerNodeInstanceType'
         NodeSecurityGroup: !Join
           - ','
-          - - !Ref 'MessageBrokerSecurityGroup'
+          - - !Ref 'EventBrokerSecurityGroup'
             - !Ref 'SolaceInternalSecurityGroup'
             - !Ref 'SolaceInternalSecurityGroupMember'
             - !Ref 'RemoteMgmtSecurityGroup'
         ParentStackName: !Ref 'AWS::StackName'
-        PersistentStorage: !Ref 'MessageBrokerNodeStorage'
+        PersistentStorage: !Ref 'EventBrokerNodeStorage'
         QSS3BucketName: !Ref 'QSS3BucketName'
         QSS3BucketRegion: !Ref 'QSS3BucketRegion'
         QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
@@ -475,6 +475,14 @@ Resources:
           ToPort: '55003'
           SourceSecurityGroupId: !Ref 'SolaceInternalSecurityGroupMember'
         - IpProtocol: tcp
+          FromPort: '55443'
+          ToPort: '55443'
+          SourceSecurityGroupId: !Ref 'SolaceInternalSecurityGroupMember'
+        - IpProtocol: tcp
+          FromPort: '1443'
+          ToPort: '1443'
+          SourceSecurityGroupId: !Ref 'SolaceInternalSecurityGroupMember'
+        - IpProtocol: tcp
           FromPort: '8000'
           ToPort: '8000'
           SourceSecurityGroupId: !Ref 'SolaceInternalSecurityGroupMember'
@@ -491,12 +499,16 @@ Resources:
           ToPort: '1883'
           SourceSecurityGroupId: !Ref 'SolaceInternalSecurityGroupMember'
         - IpProtocol: tcp
-          FromPort: '80'
-          ToPort: '80'
+          FromPort: '8008'
+          ToPort: '8008'
           SourceSecurityGroupId: !Ref 'SolaceInternalSecurityGroupMember'
         - IpProtocol: tcp
           FromPort: '8080'
           ToPort: '8080'
+          SourceSecurityGroupId: !Ref 'SolaceInternalSecurityGroupMember'
+        - IpProtocol: tcp
+          FromPort: '1943'
+          ToPort: '1943'
           SourceSecurityGroupId: !Ref 'SolaceInternalSecurityGroupMember'
         - IpProtocol: tcp
           FromPort: '5550'
@@ -518,12 +530,16 @@ Resources:
             FromPort: '22'
             ToPort: '22'
             CidrIp: !Ref 'RemoteAccessCIDR'
-  MessageBrokerSecurityGroup:
+  EventBrokerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId: !Ref 'VPCID'
-      GroupDescription: Message Broker Security Group
+      GroupDescription: Event Broker Security Group
       SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '5550'
+          ToPort: '5550'
+          CidrIp: !Ref 'RemoteAccessCIDR'
         - IpProtocol: tcp
           FromPort: '55555'
           ToPort: '55555'
@@ -531,6 +547,14 @@ Resources:
         - IpProtocol: tcp
           FromPort: '55003'
           ToPort: '55003'
+          CidrIp: !Ref 'RemoteAccessCIDR'
+        - IpProtocol: tcp
+          FromPort: '55443'
+          ToPort: '55443'
+          CidrIp: !Ref 'RemoteAccessCIDR'
+        - IpProtocol: tcp
+          FromPort: '1443'
+          ToPort: '1443'
           CidrIp: !Ref 'RemoteAccessCIDR'
         - IpProtocol: tcp
           FromPort: '8000'
@@ -549,12 +573,16 @@ Resources:
           ToPort: '1883'
           CidrIp: !Ref 'RemoteAccessCIDR'
         - IpProtocol: tcp
+          FromPort: '8008'
+          ToPort: '8008'
+          CidrIp: !Ref 'RemoteAccessCIDR'
+        - IpProtocol: tcp
           FromPort: '8080'
           ToPort: '8080'
           CidrIp: !Ref 'RemoteAccessCIDR'
         - IpProtocol: tcp
-          FromPort: '80'
-          ToPort: '80'
+          FromPort: '1943'
+          ToPort: '1943'
           CidrIp: !Ref 'RemoteAccessCIDR'
   ClusterInfoHandle:
     Type: AWS::CloudFormation::WaitConditionHandle
@@ -562,59 +590,317 @@ Resources:
     Type: AWS::CloudFormation::WaitCondition
     Condition: EnableWaitConditions
     DependsOn:
-      - MessageBrokerPrimaryStack
-      - MessageBrokerBackupStack
+      - EventBrokerPrimaryStack
+      - EventBrokerBackupStack
       - MonitorStack
     Properties:
       Handle: !Ref 'ClusterInfoHandle'
       Timeout: '600'
       Count: '1'
   ELB:
-    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     DependsOn:
-      - MessageBrokerPrimaryStack
+      - EventBrokerPrimaryStack
+      - EventBrokerBackupStack
     Condition: UsePrivateSubnetsCondition
     Properties:
-      SecurityGroups:
-        - !Ref 'MessageBrokerSecurityGroup'
-        - !Ref 'SolaceInternalSecurityGroupMember'
+      Scheme: internet-facing
       Subnets: !Ref 'PublicSubnetIDs'
-      Instances:
-        - !GetAtt 'MessageBrokerPrimaryStack.Outputs.EC2ID'
-        - !GetAtt 'MessageBrokerBackupStack.Outputs.EC2ID'
-        - !GetAtt 'MonitorStack.Outputs.EC2ID'
-      HealthCheck:
-        Target: !Join
-          - ''
-          - - 'HTTP:'
-            - 5550
-            - /health-check/guaranteed-active
-        Timeout: '3'
-        Interval: '5'
-        UnhealthyThreshold: '2'
-        HealthyThreshold: '2'
-      Listeners:
-        - LoadBalancerPort: '55555'
-          InstancePort: '55555'
-          Protocol: TCP
-        - LoadBalancerPort: '55003'
-          InstancePort: '55003'
-          Protocol: TCP
-        - LoadBalancerPort: '8000'
-          InstancePort: '8000'
-          Protocol: TCP
-        - LoadBalancerPort: '5672'
-          InstancePort: '5672'
-          Protocol: TCP
-        - LoadBalancerPort: '9000'
-          InstancePort: '9000'
-          Protocol: TCP
-        - LoadBalancerPort: '1883'
-          InstancePort: '1883'
-          Protocol: TCP
-        - LoadBalancerPort: '80'
-          InstancePort: '80'
-          Protocol: HTTP
-        - LoadBalancerPort: '8080'
-          InstancePort: '8080'
-          Protocol: HTTP
+      Type: network
+  Port55555NetworkLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn:
+      - ELB
+    Properties:
+      Port: 55555
+      Protocol: TCP
+      VpcId: !Ref 'VPCID'
+      HealthCheckPath: '/health-check/guaranteed-active'
+      HealthCheckPort: 5550
+      HealthCheckProtocol: 'HTTP'
+      Targets:
+      - Id: !GetAtt 'EventBrokerPrimaryStack.Outputs.EC2ID'
+        Port: 55555
+      - Id: !GetAtt 'EventBrokerBackupStack.Outputs.EC2ID'
+        Port: 55555
+  Port55003NetworkLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn:
+      - ELB
+    Properties:
+      Port: 55003
+      Protocol: TCP
+      VpcId: !Ref 'VPCID'
+      HealthCheckPath: '/health-check/guaranteed-active'
+      HealthCheckPort: 5550
+      HealthCheckProtocol: 'HTTP'
+      Targets:
+      - Id: !GetAtt 'EventBrokerPrimaryStack.Outputs.EC2ID'
+        Port: 55003
+      - Id: !GetAtt 'EventBrokerBackupStack.Outputs.EC2ID'
+        Port: 55003
+  Port55443NetworkLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn:
+      - ELB
+    Properties:
+      Port: 55443
+      Protocol: TCP
+      VpcId: !Ref 'VPCID'
+      HealthCheckPath: '/health-check/guaranteed-active'
+      HealthCheckPort: 5550
+      HealthCheckProtocol: 'HTTP'
+      Targets:
+      - Id: !GetAtt 'EventBrokerPrimaryStack.Outputs.EC2ID'
+        Port: 55443
+      - Id: !GetAtt 'EventBrokerBackupStack.Outputs.EC2ID'
+        Port: 55443
+  Port1443NetworkLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn:
+      - ELB
+    Properties:
+      Port: 1443
+      Protocol: TCP
+      VpcId: !Ref 'VPCID'
+      HealthCheckPath: '/health-check/guaranteed-active'
+      HealthCheckPort: 5550
+      HealthCheckProtocol: 'HTTP'
+      Targets:
+      - Id: !GetAtt 'EventBrokerPrimaryStack.Outputs.EC2ID'
+        Port: 1443
+      - Id: !GetAtt 'EventBrokerBackupStack.Outputs.EC2ID'
+        Port: 1443
+  Port8000NetworkLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn:
+      - ELB
+    Properties:
+      Port: 8000
+      Protocol: TCP
+      VpcId: !Ref 'VPCID'
+      HealthCheckPath: '/health-check/guaranteed-active'
+      HealthCheckPort: 5550
+      HealthCheckProtocol: 'HTTP'
+      Targets:
+      - Id: !GetAtt 'EventBrokerPrimaryStack.Outputs.EC2ID'
+        Port: 8000
+      - Id: !GetAtt 'EventBrokerBackupStack.Outputs.EC2ID'
+        Port: 8000
+  Port5672NetworkLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn:
+      - ELB
+    Properties:
+      Port: 5672
+      Protocol: TCP
+      VpcId: !Ref 'VPCID'
+      HealthCheckPath: '/health-check/guaranteed-active'
+      HealthCheckPort: 5550
+      HealthCheckProtocol: 'HTTP'
+      Targets:
+      - Id: !GetAtt 'EventBrokerPrimaryStack.Outputs.EC2ID'
+        Port: 5672
+      - Id: !GetAtt 'EventBrokerBackupStack.Outputs.EC2ID'
+        Port: 5672
+  Port9000NetworkLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn:
+      - ELB
+    Properties:
+      Port: 9000
+      Protocol: TCP
+      VpcId: !Ref 'VPCID'
+      HealthCheckPath: '/health-check/guaranteed-active'
+      HealthCheckPort: 5550
+      HealthCheckProtocol: 'HTTP'
+      Targets:
+      - Id: !GetAtt 'EventBrokerPrimaryStack.Outputs.EC2ID'
+        Port: 9000
+      - Id: !GetAtt 'EventBrokerBackupStack.Outputs.EC2ID'
+        Port: 9000
+  Port1883NetworkLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn:
+      - ELB
+    Properties:
+      Port: 1883
+      Protocol: TCP
+      VpcId: !Ref 'VPCID'
+      HealthCheckPath: '/health-check/guaranteed-active'
+      HealthCheckPort: 5550
+      HealthCheckProtocol: 'HTTP'
+      Targets:
+      - Id: !GetAtt 'EventBrokerPrimaryStack.Outputs.EC2ID'
+        Port: 1883
+      - Id: !GetAtt 'EventBrokerBackupStack.Outputs.EC2ID'
+        Port: 1883
+  Port8008NetworkLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn:
+      - ELB
+    Properties:
+      Port: 8008
+      Protocol: TCP
+      VpcId: !Ref 'VPCID'
+      HealthCheckPath: '/health-check/guaranteed-active'
+      HealthCheckPort: 5550
+      HealthCheckProtocol: 'HTTP'
+      Targets:
+      - Id: !GetAtt 'EventBrokerPrimaryStack.Outputs.EC2ID'
+        Port: 8008
+      - Id: !GetAtt 'EventBrokerBackupStack.Outputs.EC2ID'
+        Port: 8008
+  Port8080NetworkLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn:
+      - ELB
+    Properties:
+      Port: 8080
+      Protocol: TCP
+      VpcId: !Ref 'VPCID'
+      HealthCheckPath: '/health-check/guaranteed-active'
+      HealthCheckPort: 5550
+      HealthCheckProtocol: 'HTTP'
+      Targets:
+      - Id: !GetAtt 'EventBrokerPrimaryStack.Outputs.EC2ID'
+        Port: 8080
+      - Id: !GetAtt 'EventBrokerBackupStack.Outputs.EC2ID'
+        Port: 8080
+  Port1943NetworkLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn:
+      - ELB
+    Properties:
+      Port: 1943
+      Protocol: TCP
+      VpcId: !Ref 'VPCID'
+      HealthCheckPath: '/health-check/guaranteed-active'
+      HealthCheckPort: 5550
+      HealthCheckProtocol: 'HTTP'
+      Targets:
+      - Id: !GetAtt 'EventBrokerPrimaryStack.Outputs.EC2ID'
+        Port: 1943
+      - Id: !GetAtt 'EventBrokerBackupStack.Outputs.EC2ID'
+        Port: 1943
+  Port55555NetworkLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - ELB
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref 'Port55555NetworkLoadBalancerTargetGroup'
+      LoadBalancerArn: !Ref 'ELB'
+      Port: '55555'
+      Protocol: TCP
+  Port55003NetworkLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - ELB
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref 'Port55003NetworkLoadBalancerTargetGroup'
+      LoadBalancerArn: !Ref 'ELB'
+      Port: '55003'
+      Protocol: TCP
+  Port55443NetworkLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - ELB
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref 'Port55443NetworkLoadBalancerTargetGroup'
+      LoadBalancerArn: !Ref 'ELB'
+      Port: '55443'
+      Protocol: TCP
+  Port1443NetworkLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - ELB
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref 'Port1443NetworkLoadBalancerTargetGroup'
+      LoadBalancerArn: !Ref 'ELB'
+      Port: '1443'
+      Protocol: TCP
+  Port8000NetworkLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - ELB
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref 'Port8000NetworkLoadBalancerTargetGroup'
+      LoadBalancerArn: !Ref 'ELB'
+      Port: '8000'
+      Protocol: TCP
+  Port5672NetworkLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - ELB
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref 'Port5672NetworkLoadBalancerTargetGroup'
+      LoadBalancerArn: !Ref 'ELB'
+      Port: '5672'
+      Protocol: TCP
+  Port9000NetworkLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - ELB
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref 'Port9000NetworkLoadBalancerTargetGroup'
+      LoadBalancerArn: !Ref 'ELB'
+      Port: '9000'
+      Protocol: TCP
+  Port1883NetworkLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - ELB
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref 'Port1883NetworkLoadBalancerTargetGroup'
+      LoadBalancerArn: !Ref 'ELB'
+      Port: '1883'
+      Protocol: TCP
+  Port8008NetworkLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - ELB
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref 'Port8008NetworkLoadBalancerTargetGroup'
+      LoadBalancerArn: !Ref 'ELB'
+      Port: '8008'
+      Protocol: TCP
+  Port8080NetworkLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - ELB
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref 'Port8080NetworkLoadBalancerTargetGroup'
+      LoadBalancerArn: !Ref 'ELB'
+      Port: '8080'
+      Protocol: TCP
+  Port1943NetworkLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - ELB
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref 'Port1943NetworkLoadBalancerTargetGroup'
+      LoadBalancerArn: !Ref 'ELB'
+      Port: '1943'
+      Protocol: TCP
