@@ -28,8 +28,8 @@ tests:
       ContainerLoggingFormat: graylog
       CreatePrivateSubnets: 'true'
       KeyPairName: $[alfred_getkeypair]
-      MessageBrokerNodeInstanceType: t2.small
-      MessageBrokerNodeStorage: '0'
+      EventBrokerNodeInstanceType: t2.small
+      EventBrokerNodeStorage: '0'
       MonitorNodeInstanceType: t2.micro
       NumberOfAZs: '2'
       RemoteAccessCIDR: 0.0.0.0/16
@@ -50,8 +50,8 @@ tests:
       ContainerLoggingFormat: graylog
       CreatePrivateSubnets: 'true'
       KeyPairName: $[alfred_getkeypair]
-      MessageBrokerNodeInstanceType: t2.small
-      MessageBrokerNodeStorage: '0'
+      EventBrokerNodeInstanceType: t2.small
+      EventBrokerNodeStorage: '0'
       MonitorNodeInstanceType: t2.micro
       NumberOfAZs: '2'
       RemoteAccessCIDR: 10.0.0.0/16
@@ -71,8 +71,8 @@ tests:
       ContainerLoggingFormat: graylog
       CreatePrivateSubnets: 'true'
       KeyPairName: $[alfred_getkeypair]
-      MessageBrokerNodeInstanceType: t2.small
-      MessageBrokerNodeStorage: '0'
+      EventBrokerNodeInstanceType: t2.small
+      EventBrokerNodeStorage: '0'
       MonitorNodeInstanceType: t2.micro
       NumberOfAZs: '3'
       RemoteAccessCIDR: 10.0.0.0/16
@@ -93,7 +93,7 @@ tests:
       BootDiskSize: '24'
       CreatePrivateSubnets: 'true'
       KeyPairName: $[alfred_getkeypair]
-      MessageBrokerNodeStorage: '0'
+      EventBrokerNodeStorage: '0'
       MonitorNodeInstanceType: t2.micro
       NumberOfAZs: '3'
       RemoteAccessCIDR: 10.0.0.0/16
@@ -114,7 +114,7 @@ tests:
       BootDiskSize: '24'
       CreatePrivateSubnets: 'true'
       KeyPairName: $[alfred_getkeypair]
-      MessageBrokerNodeStorage: '0'
+      EventBrokerNodeStorage: '0'
       MonitorNodeInstanceType: t2.micro
       NumberOfAZs: '3'
       RemoteAccessCIDR: 10.0.0.0/16
