@@ -19,24 +19,25 @@ project:
   - us-west-2
   - sa-east-1
   s3_bucket: ''
+  parameters:
+    AdminPassword: $[alfred_genpass_10]
+    BootDiskSize: '24'
+    ContainerLoggingFormat: graylog
+    CreatePrivateSubnets: 'true'
+    KeyPairName: $[alfred_getkeypair]
+    EventBrokerNodeInstanceType: t2.small
+    EventBrokerNodeStorage: '0'
+    MonitorNodeInstanceType: t2.micro
+    RemoteAccessCIDR: 10.0.0.0/16
+    SSHAccessCIDR: 10.0.0.0/16
+    SolaceDockerImage: solace/solace-pubsub-standard:latest
+    QSS3BucketName: $[taskcat_autobucket]
+    QSS3BucketRegion: $[taskcat_current_region]
 tests:
   2az-americas:
     parameters:
-      AdminPassword: $[alfred_genpass_10]
       AvailabilityZones: $[alfred_genaz_2]
-      BootDiskSize: '24'
-      ContainerLoggingFormat: graylog
-      CreatePrivateSubnets: 'true'
-      KeyPairName: $[alfred_getkeypair]
-      EventBrokerNodeInstanceType: t2.small
-      EventBrokerNodeStorage: '0'
-      MonitorNodeInstanceType: t2.micro
       NumberOfAZs: '2'
-      RemoteAccessCIDR: 0.0.0.0/16
-      SSHAccessCIDR: 0.0.0.0/16
-      SolaceDockerImage: solace/solace-pubsub-standard:latest
-      QSS3BucketName: $[taskcat_autobucket]
-      QSS3BucketRegion: $[taskcat_current_region]
     regions:
     - us-west-1
     - ca-central-1
@@ -44,42 +45,16 @@ tests:
     template: templates/solace-master.template
   2az-asia:
     parameters:
-      AdminPassword: $[alfred_genpass_10]
       AvailabilityZones: $[alfred_genaz_2]
-      BootDiskSize: '24'
-      ContainerLoggingFormat: graylog
-      CreatePrivateSubnets: 'true'
-      KeyPairName: $[alfred_getkeypair]
-      EventBrokerNodeInstanceType: t2.small
-      EventBrokerNodeStorage: '0'
-      MonitorNodeInstanceType: t2.micro
       NumberOfAZs: '2'
-      RemoteAccessCIDR: 10.0.0.0/16
-      SSHAccessCIDR: 10.0.0.0/16
-      SolaceDockerImage: solace/solace-pubsub-standard:latest
-      QSS3BucketName: $[taskcat_autobucket]
-      QSS3BucketRegion: $[taskcat_current_region]
     regions:
     - ap-south-1
     s3_bucket: ''
     template: templates/solace-master.template
   3az-americas:
     parameters:
-      AdminPassword: $[alfred_genpass_10]
       AvailabilityZones: $[alfred_genaz_3]
-      BootDiskSize: '24'
-      ContainerLoggingFormat: graylog
-      CreatePrivateSubnets: 'true'
-      KeyPairName: $[alfred_getkeypair]
-      EventBrokerNodeInstanceType: t2.small
-      EventBrokerNodeStorage: '0'
-      MonitorNodeInstanceType: t2.micro
       NumberOfAZs: '3'
-      RemoteAccessCIDR: 10.0.0.0/16
-      SSHAccessCIDR: 10.0.0.0/16
-      SolaceDockerImage: solace/solace-pubsub-standard:latest
-      QSS3BucketName: $[taskcat_autobucket]
-      QSS3BucketRegion: $[taskcat_current_region]
     regions:
     - us-east-1
     - us-east-2
@@ -88,19 +63,8 @@ tests:
     template: templates/solace-master.template
   3az-asia:
     parameters:
-      AdminPassword: $[alfred_genpass_10]
       AvailabilityZones: $[alfred_genaz_3]
-      BootDiskSize: '24'
-      CreatePrivateSubnets: 'true'
-      KeyPairName: $[alfred_getkeypair]
-      EventBrokerNodeStorage: '0'
-      MonitorNodeInstanceType: t2.micro
       NumberOfAZs: '3'
-      RemoteAccessCIDR: 10.0.0.0/16
-      SSHAccessCIDR: 10.0.0.0/16
-      SolaceDockerImage: solace/solace-pubsub-standard:latest
-      QSS3BucketName: $[taskcat_autobucket]
-      QSS3BucketRegion: $[taskcat_current_region]
     regions:
     - ap-northeast-1
     - ap-southeast-1
@@ -109,23 +73,11 @@ tests:
     template: templates/solace-master.template
   3az-europe:
     parameters:
-      AdminPassword: $[alfred_genpass_10]
       AvailabilityZones: $[alfred_genaz_3]
-      BootDiskSize: '24'
-      CreatePrivateSubnets: 'true'
-      KeyPairName: $[alfred_getkeypair]
-      EventBrokerNodeStorage: '0'
-      MonitorNodeInstanceType: t2.micro
       NumberOfAZs: '3'
-      RemoteAccessCIDR: 10.0.0.0/16
-      SSHAccessCIDR: 10.0.0.0/16
-      SolaceDockerImage: solace/solace-pubsub-standard:latest
-      QSS3BucketName: $[taskcat_autobucket]
-      QSS3BucketRegion: $[taskcat_current_region]
     regions:
     - eu-west-1
     - eu-west-2
-#    - eu-west-3
     - eu-central-1
     s3_bucket: ''
     template: templates/solace-master.template

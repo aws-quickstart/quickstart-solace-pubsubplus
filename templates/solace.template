@@ -292,7 +292,9 @@ Resources:
             Statement:
               - Action:
                   - s3:GetObject
-                Resource: "*"
+                Resource: !Sub
+                  - arn:${AWS::Partition}:s3:::${S3Bucket}/${QSS3KeyPrefix}*
+                  - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
                 Effect: Allow
           PolicyName: s3-policy
         - PolicyDocument:
