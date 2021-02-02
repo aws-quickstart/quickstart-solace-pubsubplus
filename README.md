@@ -1,7 +1,7 @@
 # quickstart-solace-pubsub
 ## Solace PubSub+ Software Message Broker on the AWS Cloud
 
-This Quick Start deploys Solace PubSub+ Software Message Broker version 8.7 or later on the AWS Cloud in a highly available (HA) cluster.
+This Quick Start deploys Solace PubSub+ Software Message Broker version 9.8 or later on the AWS Cloud in a highly available (HA) cluster.
 
 The Solace message broker is an implementation of the Solace SolOS messaging technology that runs on general-purpose processors in data centers, developers’ laptops, Internet of Things (IoT) gateways, the cloud, and other enterprise environments.
 
