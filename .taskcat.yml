@@ -25,9 +25,9 @@ project:
     ContainerLoggingFormat: graylog
     CreatePrivateSubnets: 'true'
     KeyPairName: $[alfred_getkeypair]
-    EventBrokerNodeInstanceType: t2.small
+    WorkerNodeInstanceType: m4.large
     EventBrokerNodeStorage: '0'
-    MonitorNodeInstanceType: t2.micro
+    MonitorNodeInstanceType: t2.medium
     RemoteAccessCIDR: 10.0.0.0/16
     SSHAccessCIDR: 10.0.0.0/16
     SolaceDockerImage: solace/solace-pubsub-standard:latest
