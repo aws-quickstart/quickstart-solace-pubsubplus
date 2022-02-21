@@ -503,10 +503,10 @@ if [ "${is_primary}" = "true" ]; then
 
   echo "`date` INFO: Initiating config-sync for router"
   /tmp/semp_query.sh -n admin -p ${admin_password} -u http://localhost:8080/SEMP \
-    -q "<rpc><admin><config-sync><assert-master><router/></assert-master></config-sync></admin></rpc>"
+    -q "<rpc semp-version=\"soltr/9_8VMR\"><admin><config-sync><assert-master><router/></assert-master></config-sync></admin></rpc>"
   echo "`date` INFO: Initiating config-sync for default vpn"
   /tmp/semp_query.sh -n admin -p ${admin_password} -u http://localhost:8080/SEMP \
-    -q "<rpc><admin><config-sync><assert-master><vpn-name>default</vpn-name></assert-master></config-sync></admin></rpc>"
+    -q "<rpc semp-version=\"soltr/9_8VMR\"><admin><config-sync><assert-master><vpn-name>*</vpn-name></assert-master></config-sync></admin></rpc>"
 
   # Wait for config-sync results
   count=0
@@ -528,6 +528,15 @@ if [ "${is_primary}" = "true" ]; then
     esac
     ((count++))
     echo "`date` INFO: Waited ${run_time} seconds, Config-sync is not yet Up"
+
+    if (( $count % 18 == 0 )) ; then
+      echo "`date` INFO: Re-trying initiate config-sync for router"
+      /tmp/semp_query.sh -n admin -p ${admin_password} -u http://localhost:8080/SEMP \
+              -q "<rpc semp-version=\"soltr/9_8VMR\"><admin><config-sync><assert-master><router/></assert-master></config-sync></admin></rpc>"
+      /tmp/semp_query.sh -n admin -p ${admin_password} -u http://localhost:8080/SEMP \
+              -q "<rpc semp-version=\"soltr/9_8VMR\"><admin><config-sync><assert-master><vpn-name>*</vpn-name></assert-master></config-sync></admin></rpc>"
+    fi
+
     sleep ${pause}
   done
 
@@ -536,25 +545,12 @@ if [ "${is_primary}" = "true" ]; then
     exit 1
   fi
 
-  # Poll the broker Message-Spool
-  count=0
-  echo "`date` INFO: Wait for the broker message-spool service to be guaranteed-active"
-  while [ ${count} -lt ${loop_guard} ]; do
-    health_result=`curl -s -o /dev/null -w "%{http_code}"  http://localhost:5550/health-check/guaranteed-active`
-    run_time=$((${count} * ${pause}))
-    if [ "${health_result}" = "200" ]; then
-        echo "`date` INFO: broker message-spool is guaranteed-active, after ${run_time} seconds"
-        break
-    fi
-    ((count++))
-    echo "`date` INFO: Waited ${run_time} seconds, broker message-spool not yet guaranteed-active. State: ${health_result}"
-    sleep ${pause}
-  done
-  if [ ${count} -eq ${loop_guard} ]; then
-    echo "`date` ERROR: broker message-spool never came guaranteed-active" | tee /dev/stderr
-    exit 1
-  fi
-
 fi
+
+if [ ${count} -eq ${loop_guard} ]; then
+  echo "`date` ERROR: Solace bringup failed" | tee /dev/stderr
+  exit 1
+fi
+echo "`date` INFO: Solace bringup complete"
 
 echo "`date` INFO: PubSub+ HA-node bringup complete"
