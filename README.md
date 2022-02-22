@@ -1,14 +1,14 @@
 # quickstart-solace-pubsub
-## Solace PubSub+ Software Message Broker on the AWS Cloud
+## Solace PubSub+ Software Event Broker on the AWS Cloud
 
-This Quick Start deploys Solace PubSub+ Software Message Broker version 9.8 or later on the AWS Cloud in a highly available (HA) cluster.
+This Quick Start deploys Solace PubSub+ Software Event Broker version 9.13 or later on the AWS Cloud in a highly available (HA) cluster.
 
-The Solace message broker is an implementation of the Solace SolOS messaging technology that runs on general-purpose processors in data centers, developers’ laptops, Internet of Things (IoT) gateways, the cloud, and other enterprise environments.
+The Solace event broker is an implementation of the Solace SolOS messaging technology that runs on general-purpose processors in data centers, developers’ laptops, Internet of Things (IoT) gateways, the cloud, and other enterprise environments.
 
-You can use the AWS CloudFormation templates included with the Quick Start to deploy a fully configured Solace PubSub+ message broker HA cluster in your AWS account. The Quick Start automates the following:
+You can use the AWS CloudFormation templates included with the Quick Start to deploy a fully configured Solace PubSub+ event broker HA cluster in your AWS account. The Quick Start automates the following:
 
-- Deploying the Solace message broker cluster into a new VPC
-- Deploying the Solace message broker cluster into an existing VPC
+- Deploying the Solace event broker cluster into a new VPC
+- Deploying the Solace event broker cluster into an existing VPC
 
 You can also use the AWS CloudFormation templates as a starting point for your own implementation.
 
