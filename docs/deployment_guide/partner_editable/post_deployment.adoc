@@ -1,3 +1,78 @@
 // Include any postdeployment steps here, such as steps necessary to test that the deployment was successful. If there are no postdeployment steps, leave this file empty.
 
 == Postdeployment steps
+
+=== Checking the Deployment Stack
+
+The Quick Start will create the nested VPC, bastion host, and Solace stacks by using the respective templates. The Solace stack creates additional sub-stacks for the deployment of the primary, backup, and monitor PubSub+ event broker nodes. You’ll see all these listed in the AWS CloudFormation console, as illustrated in <<created-stacks-after-deployment>>. 
+
+[#created-stacks-after-deployment]
+.Created stacks after deployment
+image::../docs/deployment_guide/images/created-stacks-after-deployment.png[Created stacks after deployment]
+
+=== Gaining Admin and Messaging Service Access to the PubSub+ Event Broker
+
+For external access to the deployment, the resources of interest are:
+
+* the Elastic Load Balancer (ELB), and
+* the EC2 instances for the primary, backup, and monitoring event brokers.
+
+For management and messaging service access to the active event broker, you will need to note the information about the ELB’s external DNS host name, which can be obtained from the `SolaceStack > Outputs > LoadBalancerDNS` in the stacks section of the CloudFormation service console:
+
+[#elb-details]
+.ELB details
+image::../docs/deployment_guide/images/elb-details.png[ELB details]
+
+For direct SSH access to the individual event brokers, the public DNS host names (elastic IPs) of the EC2 instances of the Bastion Hosts and the private DNS host names of the primary, backup, and monitoring event brokers are required. This can be obtained from the `EC2 Dashboard > Instances` section of the EC2 service console:
+
+[#ec2-instance-details]
+.EC2 instance details
+image::../docs/deployment_guide/images/ec2-instance-details.png[EC2 instance details]
+
+==== Admin Access
+
+**PubSub+ Broker Manager admin console or SEMP API Access**
+
+Use the public ELB’s DNS host name and port 8080 to access the https://docs.solace.com/Solace-PubSub-Manager/PubSub-Manager-Overview.htm#mc-main-content[PubSub+ Broker Manager admin console^] from a browser or access the https://docs.solace.com/SEMP/Using-SEMP.htm[Solace Element Management API] from a REST client.
+
+Use the user `admin` and the password you set for the "AdminPassword" deployment parameter.
+
+**Using SSH connection to the individual event brokers**
+
+For SSH console access to the individual event brokers and launch the https://docs.solace.com/Solace-CLI/Using-Solace-CLI.htm[Solace Command Line Interface (CLI)] locally, you must first connect to a bastion host instance and then SSH to the event broker instance from the bastion host:
+
+Copy the Key Pair file used during deployment (KeyPairName) to the Linux Bastion Host. The key must not be publicly viewable:
+```
+chmod 400 <key.pem>
+scp -i <key.pem> <key.pem> ec2-user@<bastion-elastic-ip>:/home/ec2-user
+```
+Log in to the Linux Bastion Host:
+```
+ssh -i <key.pem> ec2-user@<bastion-elastic-ip>
+```
+From the Linux Bastion Host, SSH to your desired EC2 host that is running the event broker:
+```
+ssh -i <key.pem> ec2-user@<ec2-host>
+```
+From the host, log into the PubSub+ CLI:
+```
+sudo docker exec -it solace cli
+```
+This will open the CLI session to the target message broker, as shown in <<using-solace-cli>>.
+
+[#using-solace-cli]
+.Using Solace CLI
+image::../docs/deployment_guide/images/using-solace-cli.png[Viewing instances in the Solace CLI]
+
+==== Messaging Service Access
+
+Messaging services can be accessed through the public ELB’s DNS host name and the https://docs.solace.com/Configuring-and-Managing/Default-Port-Numbers.htm#Software[protocol / API specific Data service port^].
+
+NOTE: TLS services only become available once a https://docs.solace.com/Configuring-and-Managing/Managing-Server-Certs.htm[Server Certificate] has been configured through CLI (see previous section).
+
+=== Testing the deployment
+
+The easiest way to test data traffic though the newly created event broker instances is to use the PubSub+ Broker Manager admin console's "Try-Me!" feature. Log into the admin console and follow the instructions in https://docs.solace.com/Solace-PubSub-Manager/PubSub-Manager-Overview.htm#Test-Messages[How to Send and Receive Test Messages]. This will send and receive messages using a built-in JavaScript client via WebSockets between your local browser and the event broker.
+
+For additional information and tutorials about available protocols and APIs https://www.solace.dev/[visit the Solace developer portal].
+
