@@ -1,6 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: CloudFormation sub-template for Single Node EC2 deployment within Solace
   HA Cluster. (qs-1nm1r54hd)
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - W9002 # temporary to get rid of warnings
+        - W9003 # temporary to get rid of warnings
+        - W9006 # temporary to get rid of warnings
 Parameters:
   SolaceDockerImage:
     Description: >-
@@ -164,9 +171,6 @@ Mappings:
       AMZNLINUXHVM: ami-021bb9f371690f97a
     us-west-2:
       AMZNLINUXHVM: ami-079f731edfe27c29c
-  LinuxAMINameMap:
-    Amazon-Linux-HVM:
-      Code: AMZNLINUXHVM
   Linux2BootDisk:
     Amazon-Linux-HVM:
       BootDisk: /dev/xvda
@@ -233,18 +237,37 @@ Resources:
           Statement:
           - Action:
             - s3:GetObject
-            Resource: "*"
+            Resource: !Sub
+              - arn:${AWS::Partition}:s3:::${S3Bucket}/${QSS3KeyPrefix}*
+              - S3Bucket: !If
+                - UsingDefaultBucket
+                - !Sub '${QSS3BucketName}-${AWS::Region}'
+                - !Ref 'QSS3BucketName'
             Effect: Allow
+      - PolicyName: cfn-policy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Action:
+                - cloudformation:DescribeStackResources
+              Resource: !Sub arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*
+              Effect: Allow
       - PolicyName: ec2-policy
         PolicyDocument:
           Version: '2012-10-17'
           Statement:
           - Action:
-            - cloudformation:DescribeStackResources
             - ec2:DescribeInstances
-            - ec2:CreateTags
             Resource: '*'
             Effect: Allow
+      - PolicyName: ec2-tags-policy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Action:
+                - ec2:CreateTags
+              Resource: !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:instance/*
+              Effect: Allow
       - PolicyName: cloudwatch-policy
         PolicyDocument:
           Version: '2012-10-17'
@@ -255,7 +278,7 @@ Resources:
             - logs:PutLogEvents
             - logs:DescribeLogStreams
             Resource:
-            - arn:aws:logs:*:*:*
+            - !Sub arn:${AWS::Partition}:logs:*:*:*
             Effect: Allow
       Path: /
       AssumeRolePolicyDocument:
@@ -479,9 +502,9 @@ Resources:
               Iops: !If
                 - IOStorageType
                 - !FindInMap
-                - IOPsMap
-                - !Ref 'PersistentStorage'
-                - IOPs
+                  - IOPsMap
+                  - !Ref 'PersistentStorage'
+                  - IOPs
                 - !Ref 'AWS::NoValue'
       ImageId: !FindInMap
         - AWSAMIRegionMap
