@@ -80,6 +80,9 @@ Metadata:
         default: Quick Start S3 bucket region
       QSS3KeyPrefix:
         default: Quick Start S3 Key Prefix
+  cfn-lint:
+    config:
+      ignore_checks: [E1017]
 Parameters:
   SolaceDockerImage:
     Description: >-
