@@ -11,7 +11,9 @@ image::../docs/deployment_guide/images/architecture_diagram.png[Architecture]
 
 As shown in <<architecture1>>, this Quick Start sets up the following:
 
-* A highly available architecture that spans two Availability Zones.*
+* A highly available architecture that spans three Availability Zones. If you deploy the Quick Start in an AWS Region that has only two Availability Zones or you choose to use only two Availability Zones, the backup and monitoring instances of the message broker will be placed in the same Availability Zone.*
++
+NOTE: We recommend using three Availability Zones, where available, for production systems.
 * A virtual private cloud (VPC) configured with public and private subnets, according to AWS
 best practices, to provide you with your own virtual network on AWS.*
 * In the public subnets:
@@ -20,9 +22,11 @@ internet access for resources in the private subnets.*
 ** A Linux bastion host in an Auto Scaling group to allow inbound Secure
 Shell (SSH) access to Amazon Elastic Compute Cloud (Amazon EC2) instances in public and private subnets.*
 * In the private subnets:
-** <item>.
-** <item>.
-// Add bullet points for any additional components that are included in the deployment. Ensure that the additional components are shown in the architecture diagram. End each bullet with a period.
-* <describe any additional components>.
+** A single PubSub+ event broker instance that is assigned an HA role in each private subnet. For auto-recovery, these instances are set up with Amazon CloudWatch alarms. Docker is installed on each message broker instance, and the message broker image is installed and executed within a Docker container.
+* Elastic Load Balancing (ELB) load balancer support with health checks (using Network Load Balancer).
+* CloudWatch logging support, including the log file /tmp/install-solace.log, which logs the events during installation.
 
 [.small]#* The template that deploys this Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#
+
+NOTE: For non-production test or proof-of-concept (PoC) environments, you can choose to omit the private subnets. In that case all components in the private subnets will be deployed in the public subnets and no Linux bastion host will be required. There will be also no Load balancer deployed, all PubSub+ event brokers will have public access.
+

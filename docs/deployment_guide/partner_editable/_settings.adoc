@@ -1,9 +1,9 @@
-:quickstart-project-name: quickstart-solace-pubsub
+:quickstart-project-name: quickstart-solace-pubsubplus
 :quickstart-github-org: aws-quickstart
-:partner-product-name: Solace PubSub+
-:partner-product-short-name: PubSub+
+:partner-product-name: Solace PubSub+ Event Broker
+:partner-product-short-name: PubSub+ event broker
 :partner-company-name: Solace Corp.
-:doc-month: March
+:doc-month: April
 :doc-year: 2022
 :partner-contributors: Balazs Czoma, {partner-company-name}
 // :other-contributors: Akua Mansa, Trek10

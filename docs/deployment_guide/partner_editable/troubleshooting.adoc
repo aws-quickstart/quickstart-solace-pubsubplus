@@ -1,3 +1,16 @@
-//Add any unique troubleshooting steps here.
+=== Event Broker Logs
+
+Both PubSub+ host and container logs get logged to Amazon CloudWatch on the region where the deployment occurred. 
+
+* The initialization logs of the EC2 virtual machines that host the PubSub+ broker instances can be found under the `*/cloud-init-output.log` log stream.
+* The event broker logs can be found under the `*/solace.log` log stream. The "ContainerLoggingFormat" deployment parameter can be used to control the log output format.
+
+[#logs-in-cloudwatch]
+.Event Broker logs in CloudWatch
+image::../docs/deployment_guide/images/logs-in-cloudwatch.png[Event Broker logs in CloudWatch]
+
+=== Common Quick Start issues
 
 For troubleshooting common Quick Start issues, refer to the https://fwd.aws/rA69w?[AWS Quick Start General Information Guide^] and https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html[Troubleshooting CloudFormation^].
+
+
