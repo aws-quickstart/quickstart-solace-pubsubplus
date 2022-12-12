@@ -4,7 +4,7 @@
 
 === Checking the Deployment Stack
 
-The Quick Start will create the nested VPC, bastion host, and Solace stacks by using the respective templates. The Solace stack creates additional sub-stacks for the deployment of the primary, backup, and monitor PubSub+ event broker nodes. You’ll see all these listed in the AWS CloudFormation console, as illustrated in <<created-stacks-after-deployment>>. 
+The Partner Solution will create the nested VPC, bastion host, and Solace stacks by using the respective templates. The Solace stack creates additional sub-stacks for the deployment of the primary, backup, and monitor PubSub+ event broker nodes. You’ll see all these listed in the AWS CloudFormation console, as illustrated in <<created-stacks-after-deployment>>. 
 
 [#created-stacks-after-deployment]
 .Created stacks after deployment

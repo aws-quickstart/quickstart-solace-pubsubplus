@@ -9,8 +9,8 @@ Both PubSub+ host and container logs get logged to Amazon CloudWatch on the regi
 .Event Broker logs in CloudWatch
 image::../docs/deployment_guide/images/logs-in-cloudwatch.png[Event Broker logs in CloudWatch]
 
-=== Common Quick Start issues
+=== Common Partner Solution issues
 
-For troubleshooting common Quick Start issues, refer to the https://fwd.aws/rA69w?[AWS Quick Start General Information Guide^] and https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html[Troubleshooting CloudFormation^].
+For troubleshooting common Partner Solution issues, refer to the https://fwd.aws/rA69w?[AWS Partner Solution General Information Guide^] and https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html[Troubleshooting CloudFormation^].
 
 
