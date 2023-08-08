@@ -1,3 +1,3 @@
-This Quick Start deploys https://solace.com/products/event-broker/[{partner-product-name}^] on the AWS Cloud. If you are unfamiliar with AWS Quick Starts, refer to the https://fwd.aws/rA69w?[AWS Quick Start General Information Guide^].
+This Partner Solution deploys https://solace.com/products/event-broker/[{partner-product-name}^] on the AWS Cloud. If you are unfamiliar with AWS Partner Solutions, refer to the https://fwd.aws/rA69w?[AWS Partner Solution General Information Guide^].
 
-For advanced information about the product that this Quick Start deploys, refer to the https://{quickstart-github-org}.github.io/{quickstart-project-name}/operational/index.html[Solace PubSub+ Technical Documentation^].
+For advanced information about the product that this Partner Solution deploys, refer to the https://{quickstart-github-org}.github.io/{quickstart-project-name}/operational/index.html[Solace PubSub+ Technical Documentation^].
