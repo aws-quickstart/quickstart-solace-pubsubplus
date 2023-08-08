@@ -1,5 +1,5 @@
 project:
-  name: quickstart-solace-pubsub
+  name: quickstart-solace-pubsubplus
   owner: quickstart@amazon.com
   package_lambda: false
   regions:
